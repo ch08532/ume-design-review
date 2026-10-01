@@ -158,12 +158,6 @@ Body:     the record
 
 CloudEvents treats two events with the same `source` and `id` as duplicates, so `ce-id` carries `source.event_id`, not the record ID. That makes CloudEvents' deduplication rule and the platform's (A9) the same thing. The record ID travels as the extension `ce-umeid`. Brokers don't route on these headers; routing uses subjects and topics (6.8, M2).
 
-### 3.7 Trade-offs
-
-- **Some services must read payloads.** Trackgen has to understand detections and tracks. These become well-known types shipped with the platform (the catalogue in section 10), which customers can extend or map their own types onto, rather than fields built into the envelope.
-- **Payload queries need setup.** Querying inside a payload (for example, all tracks with squawk 7700) needs an index declared per type in configuration.
-- **It requires discipline.** The envelope only stays universal if the team resists adding "just one more" type-specific field to it.
-
 ---
 
 ## 4. What works well
@@ -572,7 +566,7 @@ Alternatives exist (for example AWS's Cedar, also open source), but OPA has the 
 | C5 | Country and coalition codes unspecified. | ISO 3166-1 alpha-3 for countries, plus named coalitions (e.g. FVEY). | DP8, DP4 |
 | C6 | No defined behaviour for missing labels. | Fail closed (section 7.4). | DP8 |
 | C7 | No rule for labels on derived data. | Derivation rules defined by the policy package (7.3). | DP8, DP7 |
-| C8 | The scheme is military-only. | Same label structure for military, government and civilian schemes (7.3). | DP6, DP8 |
+
 
 ### 7.3 Label structure
 
