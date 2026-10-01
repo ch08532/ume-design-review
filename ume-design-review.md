@@ -618,15 +618,6 @@ Allowed values per scheme:
 | CAN | UNCLASSIFIED, PROTECTED A, PROTECTED B, PROTECTED C, CONFIDENTIAL, SECRET, TOP SECRET | Same as NATO |
 | CORP | PUBLIC, INTERNAL, CONFIDENTIAL, RESTRICTED | Organization URNs (`urn:org:...`) |
 
-Information that isn't per-record access control is kept elsewhere:
-
-| Information | Where it lives | Why |
-|---|---|---|
-| TLP marking | Applied at export, per sharing agreement | Describes the recipient's handling, not the data |
-| Retention | Deployment policy, per `kind` | Same for every record of a type, but differs per deployment |
-| Legal hold | State table | Changes after writing; history is append-only |
-| Personal information fields | Payload schema, marking which fields are personal | A property of the type, not each record |
-
 An example of what a policy package's core rule might look like in OPA. It is illustrative only: the real rules, including any ranking, come from the security authority.
 
 ```rego
@@ -676,39 +667,6 @@ sources:
    - Adapters: reject messages from sources without a registered label.
 
 Actual levels, system-high values and releasability come from the program's security assessment and accreditation, not from engineering.
-
-### 7.5 Derived data: high-water mark
-
-| Field | Rule | Example |
-|---|---|---|
-| `classification` | Highest of the inputs | UNCLASSIFIED + PROTECTED B → PROTECTED B |
-| `releasable_to` | Intersection of the inputs | [CAN, USA, GBR] + [CAN] → [CAN] |
-| `caveats` | Union of the inputs | [] + [OPS-INTEL] → [OPS-INTEL] |
-| `originator` | Set by the policy package; typically inherited from the inputs (originator control) | Inputs from two originators need a policy rule |
-
-These are typical rules; the policy package is authoritative. The producing organization goes in `provenance.producer_org`, not the label. Implement once, in the policy package, used by every producing service. Inputs under different policies need an explicit rule from the security authority. Downgrading is never automatic: it needs an audited human decision or an accredited cross-domain guard.
-
-### 7.6 Civilian use
-
-The same five fields and rules apply; only the values change:
-
-```json
-"security": {
-  "policy": "CORP",
-  "classification": "CONFIDENTIAL",
-  "releasable_to": ["urn:org:northgrid-utility", "urn:org:regional-police"],
-  "caveats": ["security-ops"],
-  "originator": "urn:org:northgrid-utility"
-}
-```
-
-Additional civilian considerations:
-
-- **Multi-tenancy:** The strongest boundary is between organizations. `originator` is normally the tenant; `releasable_to` lists who it's shared with. Back it up with NATS accounts per tenant, row-level security on `originator` in Postgres, and per-tenant buckets or prefixes in object storage.
-- **Privacy:** Remote ID data includes operator location and serial numbers; video may show people. PIPEDA (and provincial laws) apply in Canada, GDPR in Europe. Mark personal fields in the payload schema so OPA can redact them by role, set retention by purpose in the deployment policy, and log access.
-- **External sharing:** Partners that expect Traffic Light Protocol markings get them at export, set by the sharing agreement.
-- **Evidence:** Provenance and hashes keep chain of custody; a legal hold in the state table stops scheduled deletion.
-- **Government (non-military):** Canadian federal departments still use PROTECTED A/B/C, so they use the CAN policy.
 
 ---
 
@@ -1051,33 +1009,7 @@ Two example policies are included: `defence-example` and `utility-example`. They
 | `zone.geofence` | Protected, restricted or monitored area | Span, open end allowed | Area (`defined`) | Required | The zone | — | iCalendar RRULE (RFC 5545) |
 | `sensor.status` | Sensor health and coverage | Instant | Coverage area | Optional | The sensor | — | — |
 
-### 10.5 Validation
-
-`tools/validate.py` runs every check below; all must pass in CI.
-
-1. **Schemas:** every schema is valid and loaded into a local registry by `$id`.
-2. **Envelope and payload:** each example against `ume.schema.json`, then its payload against the schema named in `properties.schema`.
-3. **Normative rules:** cross-field rules JSON Schema can't express (R1–R6), and the kind's type definition (R7–R9).
-4. **Deduplication:** no two records share `(source.id, source.event_id)`.
-5. **Deployment policies:** only registered kinds, valid durations and sync values.
-
-| Rule | Requirement |
-|---|---|
-| R1 | `end_datetime` ≥ `start_datetime` |
-| R2 | For spans, `datetime` = `start_datetime` |
-| R3 | `height_range.lower_m` ≤ `upper_m` |
-| R4 | `geometry` and `geometry_source` are both null or both set |
-| R5 | Polygon rings are closed |
-| R6 | Geometry is valid (no self-intersection); also enforced in PostGIS with `ST_IsValid` |
-| R7 | Time type matches the kind (instant or span) |
-| R8 | Geometry, height range, entity ID and required assets present or absent as the kind requires; `geometry_source` allowed |
-| R9 | `entity_id` matches the kind's derivation template |
-
-The envelope schema itself enforces: a complete label with values matching its `policy`; ISO 3166-1 country codes; UUIDv7 record IDs; stable source IDs and a source event ID; 2D coordinates within range; internal references only (`s3:`, `lake:`, `urn:`); multihash checksums; and no stored lineage or `self`/`next`/`prev` links.
-
-Two rules stay in services because they compare records rather than check one: label derivation (7.5, from the policy package) and `revision_of` chains.
-
-### 10.6 Storage and distribution
+### 10.5 Storage and distribution
 
 Schemas live in Git, are released as a signed bundle, and are used from a local copy on every node. Nothing fetches a schema over the network while validating data.
 
