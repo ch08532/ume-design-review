@@ -1,4 +1,4 @@
-# Type definition for zone.geofence. Ships with the product; deployment choices (retention, sync, exposure) are in deployments/.
+# Type definition for zone.geofence.
 # envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | forbidden
 # entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
 kind: zone.geofence

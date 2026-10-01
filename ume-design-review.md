@@ -83,7 +83,7 @@ The Data Fabric works the same way. Storage, routing, synchronization, security 
 
 ### 3.3 What goes in the payload
 
-Everything specific to the type: a track's callsign and speed, an image's resolution and bands, an alert's rule and severity. Adding a new type means registering a schema and a type definition (section 10), not changing the platform. Each deployment then decides retention, sync and API exposure for it.
+Everything specific to the type: a track's callsign and speed, an image's resolution and bands, an alert's rule and severity. Adding a new type means registering a schema and a type definition (section 10), not changing the platform.
 
 ### 3.4 The rule for deciding
 
@@ -239,7 +239,7 @@ WHERE kind = 'video.segment'
 
 **T5. Separate validity from retention.**
 *Why:* Expiring raw tracks is retention. Validity (a zone active until 18:00) belongs in `end_datetime`.
-*How:* Set retention per kind in the deployment policy (10.3); use `expires_at` only for per-record overrides. TimescaleDB drops whole chunks, so put short-lived kinds like `track.raw` in their own hypertable with small chunks.
+*How:* Set retention per kind in platform configuration; use `expires_at` only for per-record overrides. TimescaleDB drops whole chunks, so put short-lived kinds like `track.raw` in their own hypertable with small chunks.
 
 **T6. Partition on `datetime`.**
 *Why:* Most queries filter on event time, so TimescaleDB can skip chunks.
@@ -455,23 +455,18 @@ Identify assets by reference and checksum; add an ID on the asset only if severa
 | ID | Finding | Recommendation | Principles |
 |---|---|---|---|
 | X1 | Two extension areas, unclear schema scope. | One `payload`, one schema. | DP6 |
-| X2 | Payload indexes not addressed. | Index hints in the type definition; extra indexes in deployment policy. | DP6 |
+| X2 | Payload indexes not addressed. | Declare index hints in the type definition. | DP6 |
 
 **X1. One payload.**
 Validate `payload` against `schema` at the adapter. Pick one rule for unknown fields and apply it everywhere.
 
 **X2. Indexes from configuration.**
-*Why:* Hand-made indexes per deployment don't scale and break "configuration, not architecture".
-*How:* The type definition lists index hints that suit any deployment; a deployment policy can add more (10.3). Tooling creates partial indexes from both:
+*Why:* Hand-made indexes per installation don't scale and break "configuration, not architecture".
+*How:* Each kind's type definition lists index hints (10.3); tooling creates partial indexes from them:
 
 ```yaml
 # kinds/track.fused/type.yaml
 index_hints: ["payload->>'callsign'", "payload->>'squawk'", "payload->>'target_address'"]
-
-# deployments/utility-example/policy.yaml
-kinds:
-  zone.geofence:
-    indexes: ["payload->>'zone_name'"]
 ```
 
 ```sql
@@ -576,8 +571,8 @@ Alternatives exist (for example AWS's Cedar, also open source), but OPA has the 
 | C4 | `need_to_know` defined as countries but used as a group; matching rule undefined. | Rename to `caveats`; the user must hold all of them. | DP8 |
 | C5 | Country and coalition codes unspecified. | ISO 3166-1 alpha-3 for countries, plus named coalitions (e.g. FVEY). | DP8, DP4 |
 | C6 | No defined behaviour for missing labels. | Fail closed (section 7.4). | DP8 |
-| C7 | No rule for labels on derived data. | High-water mark (section 7.5). | DP8, DP7 |
-| C8 | The scheme is military-only. | Same label structure for military, government and civilian schemes (sections 7.3 and 7.6). | DP6, DP8 |
+| C7 | No rule for labels on derived data. | Derivation rules defined by the policy package (7.3). | DP8, DP7 |
+| C8 | The scheme is military-only. | Same label structure for military, government and civilian schemes (7.3). | DP6, DP8 |
 
 ### 7.3 Label structure
 
@@ -667,8 +662,6 @@ sources:
    - Adapters: reject messages from sources without a registered label.
 
 Actual levels, system-high values and releasability come from the program's security assessment and accreditation, not from engineering.
-
----
 
 ## 8. Proposed revised UME
 
@@ -915,7 +908,7 @@ Every `kind` has a payload schema, a type definition and at least one example. T
 | Old versions are never deleted | Archived records still point to them. |
 | Shared definitions live in `common.v1` | Altitude, angles, speeds, IDs and standard lists are defined once and referenced with `$ref`. |
 | Shared structure lives in `base/` | Kinds in one family (alert kinds) extend a base schema. |
-| Type definition ships with the product; deployment policy doesn't | What a kind *is* stays the same everywhere; how long it's kept and where it syncs differs per customer. |
+| Each kind has a type definition | Envelope rules, identity derivation and index hints sit beside the schema. |
 | Each kind has examples | Examples are test fixtures, validated in CI on every change. |
 | Reuse standard field names where they exist | Imagery uses STAC field names; alerts use CAP values; identities use APP-6 (DP4). |
 
@@ -930,19 +923,15 @@ schemas/
     v1.schema.json                payload schema
     type.yaml                     type definition
     examples/*.json               valid records (test fixtures)
-deployments/<deployment>/
-  policy.yaml                     retention, sync, exposure, extra indexes
 tools/
   validate.py                     validates everything; used in CI
 ```
 
 Schemas reference each other by URN (for example `urn:schema:fabric:common:v1#/$defs/altitude`), resolved from this folder, never from the network.
 
-### 10.3 Type definition and deployment policy
+### 10.3 Type definition
 
-What a kind is and how a deployment handles it are kept apart. A defence deployment might keep zones for ten years and a utility for three; one node might replicate whole video segments and another only thumbnails. None of that changes what a zone or a video segment is.
-
-**Type definition** (`kinds/<kind>/type.yaml`, ships with the product):
+Each kind's `type.yaml` describes what the kind is, beyond its payload schema:
 
 ```yaml
 kind: track.fused
@@ -960,35 +949,13 @@ source_event_id: track_id + Trackgen update sequence
 index_hints: ["payload->>'callsign'", "payload->>'squawk'", "payload->>'target_address'"]
 ```
 
-**Deployment policy** (`deployments/<deployment>/policy.yaml`, per customer or deployment):
-
-```yaml
-deployment: defence-example
-defaults:
-  retention: P1Y
-  sync: {priority: operational, mode: full}
-kinds:
-  track.fused:
-    retention: P90D
-    ogc_collection: tracks
-    sync: {priority: operational, mode: downsample, rate_hz: 1}
-  video.segment:
-    retention: P30D
-    ogc_collection: video
-    sync: {priority: bulk, mode: on_request, assets: [thumbnail, klv]}
-nodes:
-  site-a:
-    kinds:
-      video.segment:
-        sync: {priority: bulk, mode: full}
-```
-
-| Belongs in | Contents | Used by |
+| Section | Used by | For |
 |---|---|---|
-| Type definition | Payload schema; envelope rules (time, geometry, height, entity); how `entity_id` and `source.event_id` are derived; required assets; personal fields (in the schema); index hints | Adapters, validator, all services |
-| Deployment policy | Retention, sync priority and mode (per node if needed), which assets sync, OGC collection, extra indexes, archive policy | DB writer, retention job, edge sync, GSS |
+| `envelope` | Adapters, `validate.py` | Rules the envelope must meet for this kind |
+| `entity_id_template`, `source_event_id` | Adapters, producers | How identity is derived, so every producer computes the same values |
+| `index_hints` | Index tooling | Partial indexes for common payload queries |
 
-Two example policies are included: `defence-example` and `utility-example`. They keep the same kinds for different periods and sync them differently.
+Retention, synchronization between nodes and API exposure (which OGC collection serves a kind) are platform configuration and outside the scope of this schema package.
 
 ### 10.4 Kinds
 
@@ -1019,7 +986,6 @@ Schemas live in Git, are released as a signed bundle, and are used from a local 
 | Release | Versioned schema bundle, signed (Cosign), stored as an OCI artifact in Harbor | One immutable, verifiable unit to deploy |
 | Runtime | On disk on every node, delivered by GitOps like OPA bundles | Offline validation and URN lookup; no registry needed at the edge |
 | Discovery (optional) | Apicurio Registry at the core, loaded from the bundle | Browsing and API for developers and partners; a copy, never the source of truth |
-| Deployment policies | Separate repository per deployment, delivered by GitOps | Customer-specific; not part of the product bundle |
 
 - Records store only the schema URN, and every bundle keeps all old versions, so archived records stay readable.
 - A record naming a schema the node doesn't have is quarantined until the bundle catches up; it's never fetched remotely.
@@ -1062,7 +1028,7 @@ The **radar plot** has an estimated position with a 40 m error, a height of 3,19
 
 `video.segment/examples/uav-eo-segment.json` is 10 seconds from a UAV EO camera: one record describing several files.
 
-- **Time** is a span (17:45:10–17:45:20), with `datetime` set to the start (R2).
+- **Time** is a span (17:45:10–17:45:20), with `datetime` set to the start (T2).
 - **Geometry** is the 2D ground area the camera saw, from KLV; `height_range` 71.5–74 m is the terrain height across the footprint. The aircraft's own position is in the payload (`sensor_position`).
 - **Provenance:** primary data, so `derived_from` is empty. An EO detection found in this video would be a `sensor.detection` listing this segment in its `derived_from`.
 - **Links:** a `service` link to the sensor's live stream, by URN, resolved by the access layer. `next` / `previous` aren't stored (L2).
@@ -1074,7 +1040,7 @@ The **radar plot** has an estimated position with a 40 m error, a height of 3,19
 | `thumbnail` | Preview image | `image/jpeg` | thumbnail |
 | `klv` | Decoded KLV as JSON | `application/json` | metadata |
 
-All `href` values are `s3://` references; GSS turns them into presigned or proxied URLs after the access check (L1). In the defence deployment policy, edge nodes sync only the thumbnail and KLV to the core, and the full segment on request.
+All `href` values are `s3://` references; GSS turns them into presigned or proxied URLs after the access check (L1).
 
 The **orthomosaic** (`imagery.ortho/examples/sector-b-orthomosaic.json`) follows the same pattern, with STAC field names in its payload so it exports as a STAC Item without translation.
 
@@ -1097,7 +1063,7 @@ The **orthomosaic** (`imagery.ortho/examples/sector-b-orthomosaic.json`) follows
 
 **Non-conformance:** `alert.nonconformance/examples/bvlos-volume-exit.json` shows track `site-a:9512` 85 m outside the volume, `derived_from` the track and the volume. Its `releasable_to` is the intersection of its inputs' (the utility only).
 
-The volume's originator is the USS (it controls the operator's flight data), while the producing organization is the utility that runs the adapter. The payload schema marks `uas_serial` and `operator_id` with `"x-personal-info": true`, which OPA uses to redact them for users without personal-information access (7.6).
+The volume's originator is the USS (it controls the operator's flight data), while the producing organization is the utility that runs the adapter. The payload schema marks `uas_serial` and `operator_id` with `"x-personal-info": true`, which OPA uses to redact them for users without personal-information access.
 
 ### 11.4 NOTAM
 
