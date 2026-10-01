@@ -1,0 +1,19 @@
+# Type definition for alert.zone_breach. Ships with the product; deployment choices (retention, sync, exposure) are in deployments/.
+# envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | forbidden
+# entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
+kind: alert.zone_breach
+schema: urn:schema:alert:zone-breach:v1
+status: draft
+envelope:
+  time: instant
+  geometry: required
+  geometry_source:
+  - observed
+  height_range: optional
+  entity_id: required
+  entity_id_template: '{id}'
+  required_assets: []
+source_event_id: rule_id + track_id + breach time
+index_hints:
+- payload->>'zone_id'
+- payload->>'severity'

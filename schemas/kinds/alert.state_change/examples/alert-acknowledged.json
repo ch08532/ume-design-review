@@ -1,0 +1,59 @@
+{
+  "type": "Feature",
+  "id": "urn:uuid:01926f45-6b00-7a10-8b20-9c0d1e2f3a4b",
+  "geometry": null,
+  "properties": {
+    "ume_version": "1",
+    "kind": "alert.state_change",
+    "schema": "urn:schema:alert:state-change:v1",
+    "entity_id": "urn:uuid:01926f45-5c12-7d34-9e56-0a1b2c3d4e5f",
+    "datetime": "2026-09-23T18:05:30.000Z",
+    "start_datetime": null,
+    "end_datetime": null,
+    "time_source": "event",
+    "times": {
+      "source_at": "2026-09-23T18:05:30.000Z",
+      "sent_at": "2026-09-23T18:05:30.015Z",
+      "received_at": "2026-09-23T18:05:30.030Z",
+      "stored_at": "2026-09-23T18:05:30.041Z"
+    },
+    "expires_at": null,
+    "geometry_source": null,
+    "position_error_m": null,
+    "domain": null,
+    "source": {
+      "id": "urn:source:console-03",
+      "node": "site-a",
+      "event_id": "ack-55821"
+    },
+    "provenance": {
+      "origin": "urn:source:console-03",
+      "derived_from": [],
+      "revision_of": null,
+      "produced_by": "operator-console",
+      "producer_version": "2.3.1",
+      "producer_org": "urn:org:northgrid-utility",
+      "config_hash": null
+    },
+    "security": {
+      "policy": "CORP",
+      "classification": "CONFIDENTIAL",
+      "releasable_to": [
+        "urn:org:northgrid-utility",
+        "urn:org:regional-police"
+      ],
+      "caveats": [
+        "security-ops"
+      ],
+      "originator": "urn:org:northgrid-utility"
+    },
+    "payload": {
+      "status": "ACKNOWLEDGED",
+      "previous_status": "ACTIVE",
+      "actor": "urn:user:northgrid:op-117",
+      "note": "Investigating; camera tasked"
+    }
+  },
+  "links": [],
+  "assets": {}
+}

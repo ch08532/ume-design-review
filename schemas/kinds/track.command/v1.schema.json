@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:schema:tracks:command:v1",
+  "title": "Payload: operator track command v1",
+  "description": "An operator action on one or more tracks. Trackgen applies it and lists this record in the updated track's derived_from.",
+  "type": "object",
+  "required": [
+    "command",
+    "target_track_ids",
+    "operator"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "command": {
+      "enum": [
+        "MERGE",
+        "SPLIT",
+        "RECLASSIFY",
+        "IDENTIFY",
+        "TAG",
+        "DROP"
+      ]
+    },
+    "target_track_ids": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:schema:fabric:common:v1#/$defs/track_id"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "identity": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/standard_identity"
+    },
+    "object_class": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/object_class"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "operator": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/user_urn",
+      "x-personal-info": true
+    },
+    "reason": {
+      "type": "string"
+    }
+  }
+}

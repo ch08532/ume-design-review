@@ -1,0 +1,60 @@
+{
+  "type": "Feature",
+  "id": "urn:uuid:01926f4b-f000-7d10-8e20-3a4b5c6d7e8f",
+  "geometry": null,
+  "properties": {
+    "ume_version": "1",
+    "kind": "utm.intent_state",
+    "schema": "urn:schema:utm:intent-state:v1",
+    "entity_id": "urn:uuid:6d1c5c2e-8f3a-4b5e-9c7d-2a1b3c4d5e6f",
+    "datetime": "2026-09-23T18:00:00.000Z",
+    "start_datetime": null,
+    "end_datetime": null,
+    "time_source": "event",
+    "times": {
+      "source_at": "2026-09-23T18:00:00.050Z",
+      "sent_at": "2026-09-23T18:00:00.080Z",
+      "received_at": "2026-09-23T18:00:00.140Z",
+      "stored_at": "2026-09-23T18:00:00.160Z"
+    },
+    "expires_at": null,
+    "geometry_source": null,
+    "position_error_m": null,
+    "domain": null,
+    "source": {
+      "id": "urn:source:uss-alpha",
+      "node": "core",
+      "event_id": "6d1c5c2e-8f3a-4b5e-9c7d-2a1b3c4d5e6f:v1:Activated"
+    },
+    "provenance": {
+      "origin": "urn:source:uss-alpha",
+      "derived_from": [],
+      "revision_of": null,
+      "produced_by": "utm-adapter",
+      "producer_version": "0.4.0",
+      "producer_org": "urn:org:northgrid-utility",
+      "config_hash": null
+    },
+    "security": {
+      "policy": "CORP",
+      "classification": "CONFIDENTIAL",
+      "releasable_to": [
+        "urn:org:northgrid-utility",
+        "urn:org:uss-alpha"
+      ],
+      "caveats": [
+        "security-ops"
+      ],
+      "originator": "urn:org:uss-alpha"
+    },
+    "payload": {
+      "operational_intent_id": "6d1c5c2e-8f3a-4b5e-9c7d-2a1b3c4d5e6f",
+      "version": 1,
+      "state": "Activated",
+      "previous_state": "Accepted",
+      "uss": "urn:org:uss-alpha"
+    }
+  },
+  "links": [],
+  "assets": {}
+}

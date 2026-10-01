@@ -1,0 +1,212 @@
+{
+  "type": "Feature",
+  "id": "urn:uuid:01926f41-0c22-7b44-a1e2-5f6a7b8c9d01",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -75.6972,
+          45.45477
+        ],
+        [
+          -75.68493,
+          45.45364
+        ],
+        [
+          -75.6735,
+          45.45032
+        ],
+        [
+          -75.66368,
+          45.44503
+        ],
+        [
+          -75.65615,
+          45.43814
+        ],
+        [
+          -75.65141,
+          45.43011
+        ],
+        [
+          -75.64979,
+          45.4215
+        ],
+        [
+          -75.65141,
+          45.41289
+        ],
+        [
+          -75.65615,
+          45.40486
+        ],
+        [
+          -75.66368,
+          45.39797
+        ],
+        [
+          -75.6735,
+          45.39268
+        ],
+        [
+          -75.68493,
+          45.38936
+        ],
+        [
+          -75.6972,
+          45.38823
+        ],
+        [
+          -75.70947,
+          45.38936
+        ],
+        [
+          -75.7209,
+          45.39268
+        ],
+        [
+          -75.73072,
+          45.39797
+        ],
+        [
+          -75.73825,
+          45.40486
+        ],
+        [
+          -75.74299,
+          45.41289
+        ],
+        [
+          -75.74461,
+          45.4215
+        ],
+        [
+          -75.74299,
+          45.43011
+        ],
+        [
+          -75.73825,
+          45.43814
+        ],
+        [
+          -75.73072,
+          45.44503
+        ],
+        [
+          -75.7209,
+          45.45032
+        ],
+        [
+          -75.70947,
+          45.45364
+        ],
+        [
+          -75.6972,
+          45.45477
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "ume_version": "1",
+    "kind": "aim.notam",
+    "schema": "urn:schema:aim:notam:v1",
+    "entity_id": "urn:notam:A1234/26",
+    "datetime": "2026-09-23T17:00:00.000Z",
+    "start_datetime": "2026-09-23T17:00:00.000Z",
+    "end_datetime": "2026-09-23T21:00:00.000Z",
+    "time_source": "event",
+    "times": {
+      "source_at": "2026-09-22T14:12:00.000Z",
+      "sent_at": "2026-09-22T14:12:05.000Z",
+      "received_at": "2026-09-22T14:12:07.410Z",
+      "stored_at": "2026-09-22T14:12:07.520Z"
+    },
+    "expires_at": null,
+    "geometry_source": "defined",
+    "position_error_m": null,
+    "domain": "AIR",
+    "height_range": {
+      "lower_m": null,
+      "upper_m": 423.0,
+      "approximate": false
+    },
+    "source": {
+      "id": "urn:source:notam-feed-01",
+      "node": "core",
+      "event_id": "A1234/26"
+    },
+    "provenance": {
+      "origin": "urn:source:notam-feed-01",
+      "derived_from": [],
+      "revision_of": null,
+      "produced_by": "notam-adapter",
+      "producer_version": "0.2.1",
+      "producer_org": "urn:org:northgrid-utility",
+      "config_hash": null
+    },
+    "security": {
+      "policy": "CORP",
+      "classification": "PUBLIC",
+      "releasable_to": [
+        "urn:org:northgrid-utility",
+        "urn:org:uss-alpha"
+      ],
+      "caveats": [],
+      "originator": "urn:org:ansp"
+    },
+    "payload": {
+      "notam_id": "A1234/26",
+      "notam_type": "NOTAMN",
+      "replaces": null,
+      "fir": "CZUL",
+      "location": "CYOW",
+      "q_code": "QRTCA",
+      "traffic": "IV",
+      "purpose": "BO",
+      "scope": "W",
+      "schedule": null,
+      "text": "TEMPORARY RESTRICTED AREA ACTIVATED 2NM RADIUS CENTRED 452517N 0754150W. RPAS OPERATIONS PROHIBITED.",
+      "altitude_lower": {
+        "value": 0,
+        "reference": "SFC",
+        "units": "FT"
+      },
+      "altitude_upper": {
+        "value": 1500,
+        "reference": "AMSL",
+        "units": "FT"
+      },
+      "area": {
+        "center": [
+          -75.6972,
+          45.4215
+        ],
+        "radius": 2,
+        "radius_units": "NM"
+      }
+    }
+  },
+  "links": [],
+  "assets": {
+    "data": {
+      "href": "s3://mission-lake/aim/notam/2026/09/22/A1234-26.xml",
+      "type": "application/xml",
+      "title": "Original NOTAM (AIXM 5.1 Digital NOTAM)",
+      "roles": [
+        "data"
+      ],
+      "file:size": 6144,
+      "file:checksum": "12204d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d"
+    },
+    "text": {
+      "href": "s3://mission-lake/aim/notam/2026/09/22/A1234-26.txt",
+      "type": "text/plain",
+      "title": "Original ICAO-format text",
+      "roles": [
+        "metadata"
+      ]
+    }
+  }
+}

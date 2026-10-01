@@ -1,0 +1,79 @@
+{
+  "type": "Feature",
+  "id": "urn:uuid:01926f45-5c12-7d34-9e56-0a1b2c3d4e5f",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -75.7052,
+      45.3938
+    ]
+  },
+  "properties": {
+    "ume_version": "1",
+    "kind": "alert.zone_breach",
+    "schema": "urn:schema:alert:zone-breach:v1",
+    "entity_id": "urn:uuid:01926f45-5c12-7d34-9e56-0a1b2c3d4e5f",
+    "datetime": "2026-09-23T18:05:12.400Z",
+    "start_datetime": null,
+    "end_datetime": null,
+    "time_source": "event",
+    "times": {
+      "source_at": "2026-09-23T18:05:12.430Z",
+      "sent_at": "2026-09-23T18:05:12.440Z",
+      "received_at": "2026-09-23T18:05:12.452Z",
+      "stored_at": "2026-09-23T18:05:12.460Z"
+    },
+    "expires_at": null,
+    "geometry_source": "observed",
+    "position_error_m": 15.0,
+    "domain": "AIR",
+    "height_range": {
+      "lower_m": 95.0,
+      "upper_m": 95.0,
+      "approximate": false
+    },
+    "source": {
+      "id": "urn:source:alert-engine-01",
+      "node": "site-a",
+      "event_id": "zone-entry-protected-site:site-a:9507:2026-09-23T18:05:12.400Z"
+    },
+    "provenance": {
+      "origin": "urn:source:rid-0012",
+      "derived_from": [
+        "urn:uuid:01926f45-5b90-7c21-8d43-1f2e3d4c5b6a",
+        "urn:uuid:01926f30-0000-7a01-8b02-0c0d0e0f1011"
+      ],
+      "revision_of": null,
+      "produced_by": "alert-engine",
+      "producer_version": "1.4.0",
+      "producer_org": "urn:org:northgrid-utility",
+      "config_hash": "1220b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8"
+    },
+    "security": {
+      "policy": "CORP",
+      "classification": "CONFIDENTIAL",
+      "releasable_to": [
+        "urn:org:northgrid-utility",
+        "urn:org:regional-police"
+      ],
+      "caveats": [
+        "security-ops"
+      ],
+      "originator": "urn:org:northgrid-utility"
+    },
+    "payload": {
+      "severity": "SEVERE",
+      "urgency": "IMMEDIATE",
+      "certainty": "OBSERVED",
+      "rule_id": "zone-entry-protected-site",
+      "message": "UAS track site-a:9507 entered Substation B protection zone",
+      "track_ids": [
+        "site-a:9507"
+      ],
+      "zone_id": "urn:zone:northgrid:substation-b",
+      "breach_type": "ENTRY"
+    }
+  },
+  "links": [],
+  "assets": {}
+}

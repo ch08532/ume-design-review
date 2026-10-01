@@ -1,0 +1,179 @@
+{
+  "type": "Feature",
+  "id": "urn:uuid:01926f3a-7d01-7bb2-b841-39659b8120e5",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -75.665,
+          45.77116
+        ],
+        [
+          -75.49967,
+          45.75585
+        ],
+        [
+          -75.3456,
+          45.71098
+        ],
+        [
+          -75.2133,
+          45.6396
+        ],
+        [
+          -75.11178,
+          45.54658
+        ],
+        [
+          -75.04796,
+          45.43825
+        ],
+        [
+          -75.0262,
+          45.322
+        ],
+        [
+          -75.04796,
+          45.20575
+        ],
+        [
+          -75.11178,
+          45.09742
+        ],
+        [
+          -75.2133,
+          45.0044
+        ],
+        [
+          -75.3456,
+          44.93302
+        ],
+        [
+          -75.49967,
+          44.88815
+        ],
+        [
+          -75.665,
+          44.87284
+        ],
+        [
+          -75.83033,
+          44.88815
+        ],
+        [
+          -75.9844,
+          44.93302
+        ],
+        [
+          -76.1167,
+          45.0044
+        ],
+        [
+          -76.21822,
+          45.09742
+        ],
+        [
+          -76.28204,
+          45.20575
+        ],
+        [
+          -76.3038,
+          45.322
+        ],
+        [
+          -76.28204,
+          45.43825
+        ],
+        [
+          -76.21822,
+          45.54658
+        ],
+        [
+          -76.1167,
+          45.6396
+        ],
+        [
+          -75.9844,
+          45.71098
+        ],
+        [
+          -75.83033,
+          45.75585
+        ],
+        [
+          -75.665,
+          45.77116
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "ume_version": "1",
+    "kind": "track.raw",
+    "schema": "urn:schema:tracks:raw-message:v1",
+    "datetime": "2026-09-23T17:46:01.100Z",
+    "start_datetime": null,
+    "end_datetime": null,
+    "time_source": "event",
+    "times": {
+      "source_at": "2026-09-23T17:46:01.100Z",
+      "sent_at": "2026-09-23T17:46:01.115Z",
+      "received_at": "2026-09-23T17:46:01.130Z",
+      "stored_at": "2026-09-23T17:46:01.145Z"
+    },
+    "expires_at": null,
+    "geometry_source": "sensor_coverage",
+    "position_error_m": null,
+    "domain": "AIR",
+    "source": {
+      "id": "urn:source:flightline-0037",
+      "node": "site-a",
+      "event_id": "012/037:491208"
+    },
+    "provenance": {
+      "origin": "urn:source:flightline-0037",
+      "derived_from": [],
+      "revision_of": null,
+      "produced_by": "flightline-adapter",
+      "producer_version": "1.2.0",
+      "producer_org": "urn:org:dnd",
+      "config_hash": null
+    },
+    "security": {
+      "policy": "CAN",
+      "classification": "UNCLASSIFIED",
+      "releasable_to": [
+        "CAN",
+        "USA",
+        "GBR",
+        "AUS",
+        "NZL"
+      ],
+      "caveats": [],
+      "originator": "urn:org:dnd"
+    },
+    "payload": {
+      "format": "ASTERIX",
+      "category": "CAT021",
+      "byte_length": 49,
+      "batch_offset": 18432,
+      "sequence": 491208,
+      "interface": "eth0",
+      "port": 50105
+    }
+  },
+  "links": [],
+  "assets": {
+    "data": {
+      "href": "s3://mission-lake/raw/flightline-0037/2026/09/23/1746.bin",
+      "type": "application/octet-stream",
+      "title": "Raw message batch (one minute)",
+      "roles": [
+        "data"
+      ],
+      "file:size": 2457600,
+      "file:checksum": "12207e7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e7e"
+    }
+  }
+}

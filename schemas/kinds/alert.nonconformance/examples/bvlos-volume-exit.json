@@ -1,0 +1,82 @@
+{
+  "type": "Feature",
+  "id": "urn:uuid:01926f4c-0e31-7e42-8f53-6a7b8c9d0e1f",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -75.7242,
+      45.4012
+    ]
+  },
+  "properties": {
+    "ume_version": "1",
+    "kind": "alert.nonconformance",
+    "schema": "urn:schema:alert:nonconformance:v1",
+    "entity_id": "urn:uuid:01926f4c-0e31-7e42-8f53-6a7b8c9d0e1f",
+    "datetime": "2026-09-23T18:12:30.000Z",
+    "start_datetime": null,
+    "end_datetime": null,
+    "time_source": "event",
+    "times": {
+      "source_at": "2026-09-23T18:12:30.040Z",
+      "sent_at": "2026-09-23T18:12:30.050Z",
+      "received_at": "2026-09-23T18:12:30.061Z",
+      "stored_at": "2026-09-23T18:12:30.070Z"
+    },
+    "expires_at": null,
+    "geometry_source": "observed",
+    "position_error_m": 10.0,
+    "domain": "AIR",
+    "height_range": {
+      "lower_m": 96.0,
+      "upper_m": 96.0,
+      "approximate": false
+    },
+    "source": {
+      "id": "urn:source:conformance-monitor-01",
+      "node": "core",
+      "event_id": "utm-nominal-volume-exit:site-a:9512:6d1c5c2e-8f3a-4b5e-9c7d-2a1b3c4d5e6f:2026-09-23T18:12:30Z"
+    },
+    "provenance": {
+      "origin": "urn:source:uss-alpha",
+      "derived_from": [
+        "urn:uuid:01926f4c-0d10-7a01-9b02-1c2d3e4f5a6b",
+        "urn:uuid:01926f40-2b10-7a3c-8d11-4e5f6a7b8c90"
+      ],
+      "revision_of": null,
+      "produced_by": "conformance-monitor",
+      "producer_version": "0.3.0",
+      "producer_org": "urn:org:northgrid-utility",
+      "config_hash": "1220d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2"
+    },
+    "security": {
+      "policy": "CORP",
+      "classification": "CONFIDENTIAL",
+      "releasable_to": [
+        "urn:org:northgrid-utility"
+      ],
+      "caveats": [
+        "security-ops"
+      ],
+      "originator": "urn:org:northgrid-utility"
+    },
+    "payload": {
+      "severity": "MODERATE",
+      "urgency": "IMMEDIATE",
+      "certainty": "OBSERVED",
+      "rule_id": "utm-nominal-volume-exit",
+      "message": "Track site-a:9512 is 85 m outside its nominal volume",
+      "track_ids": [
+        "site-a:9512"
+      ],
+      "operational_intent_id": "6d1c5c2e-8f3a-4b5e-9c7d-2a1b3c4d5e6f",
+      "volume_id": "urn:uuid:01926f40-2b10-7a3c-8d11-4e5f6a7b8c90",
+      "deviation": {
+        "horizontal_m": 85.0,
+        "vertical_m": 0.0
+      }
+    }
+  },
+  "links": [],
+  "assets": {}
+}

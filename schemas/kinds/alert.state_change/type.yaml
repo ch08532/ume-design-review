@@ -1,0 +1,16 @@
+# Type definition for alert.state_change. Ships with the product; deployment choices (retention, sync, exposure) are in deployments/.
+# envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | forbidden
+# entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
+kind: alert.state_change
+schema: urn:schema:alert:state-change:v1
+status: draft
+envelope:
+  time: instant
+  geometry: forbidden
+  geometry_source: []
+  height_range: forbidden
+  entity_id: required
+  required_assets: []
+source_event_id: Console action ID
+index_hints:
+- payload->>'status'

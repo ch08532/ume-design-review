@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:schema:zones:geofence:v1",
+  "title": "Payload: geofence zone v1",
+  "description": "A protected, restricted or monitored area. Footprint is the envelope geometry, active period is start/end_datetime (open end = permanent), converted height is height_range.",
+  "type": "object",
+  "required": [
+    "zone_name",
+    "zone_type",
+    "authority",
+    "altitude_lower",
+    "altitude_upper"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "zone_name": {
+      "type": "string"
+    },
+    "zone_type": {
+      "enum": [
+        "PROTECTED_SITE",
+        "RESTRICTED",
+        "NO_FLY",
+        "MONITORING",
+        "CORRIDOR"
+      ]
+    },
+    "authority": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/org_urn"
+    },
+    "altitude_lower": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/altitude"
+    },
+    "altitude_upper": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/altitude"
+    },
+    "schedule": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Recurrence as an iCalendar RRULE (RFC 5545), e.g. FREQ=DAILY;BYHOUR=18"
+    },
+    "breach_severity": {
+      "enum": [
+        "EXTREME",
+        "SEVERE",
+        "MODERATE",
+        "MINOR"
+      ],
+      "description": "Severity of alerts raised on breach (CAP)"
+    }
+  }
+}

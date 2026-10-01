@@ -1,0 +1,19 @@
+# Type definition for imagery.ortho. Ships with the product; deployment choices (retention, sync, exposure) are in deployments/.
+# envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | forbidden
+# entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
+kind: imagery.ortho
+schema: urn:schema:imagery:ortho:v1
+status: draft
+envelope:
+  time: span
+  geometry: required
+  geometry_source:
+  - observed
+  height_range: optional
+  entity_id: forbidden
+  required_assets:
+  - data
+source_event_id: Capture ID from the platform
+index_hints:
+- payload->>'mission_id'
+- payload->>'platform'

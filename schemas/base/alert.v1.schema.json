@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:schema:alert:base:v1",
+  "title": "Alert base v1",
+  "description": "Fields shared by all alert.* kinds that raise an alert. Severity, urgency and certainty follow OASIS CAP 1.2. Acknowledgement and resolution are separate alert.state_change records with the same entity_id.",
+  "type": "object",
+  "required": [
+    "severity",
+    "urgency",
+    "certainty",
+    "rule_id",
+    "message"
+  ],
+  "properties": {
+    "severity": {
+      "enum": [
+        "EXTREME",
+        "SEVERE",
+        "MODERATE",
+        "MINOR",
+        "UNKNOWN"
+      ]
+    },
+    "urgency": {
+      "enum": [
+        "IMMEDIATE",
+        "EXPECTED",
+        "FUTURE",
+        "PAST",
+        "UNKNOWN"
+      ]
+    },
+    "certainty": {
+      "enum": [
+        "OBSERVED",
+        "LIKELY",
+        "POSSIBLE",
+        "UNLIKELY",
+        "UNKNOWN"
+      ]
+    },
+    "rule_id": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "track_ids": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:schema:fabric:common:v1#/$defs/track_id"
+      },
+      "uniqueItems": true
+    }
+  }
+}

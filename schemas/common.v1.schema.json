@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:schema:fabric:common:v1",
+  "title": "Shared payload definitions v1",
+  "description": "Definitions referenced by payload schemas with $ref, e.g. urn:schema:fabric:common:v1#/$defs/altitude. Define once, reuse everywhere.",
+  "$defs": {
+    "altitude": {
+      "description": "Altitude as published by the source, with datum and units. The envelope height_range holds the converted WGS84 form.",
+      "type": "object",
+      "required": [
+        "value",
+        "reference",
+        "units"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "number"
+        },
+        "reference": {
+          "enum": [
+            "W84",
+            "AMSL",
+            "AGL",
+            "SFC",
+            "STD"
+          ],
+          "description": "W84 = WGS84 ellipsoid; SFC = surface; STD = standard pressure (flight level)"
+        },
+        "units": {
+          "enum": [
+            "M",
+            "FT",
+            "FL"
+          ]
+        }
+      }
+    },
+    "angle_deg": {
+      "type": "number",
+      "minimum": 0,
+      "exclusiveMaximum": 360,
+      "description": "Degrees clockwise from true north"
+    },
+    "speed_mps": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Metres per second"
+    },
+    "rate_mps": {
+      "type": "number",
+      "description": "Metres per second, positive up"
+    },
+    "lon_lat": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        }
+      ]
+    },
+    "lon_lat_h": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "prefixItems": [
+        {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "description": "[lon, lat, ellipsoidal height m]"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Meaning defined by the field that uses it"
+    },
+    "track_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_-]+:[0-9]+$",
+      "description": "Namespaced by node, e.g. site-a:9421"
+    },
+    "uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "uuid_urn": {
+      "type": "string",
+      "pattern": "^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "org_urn": {
+      "type": "string",
+      "pattern": "^urn:org:[a-z0-9_.-]+$"
+    },
+    "user_urn": {
+      "type": "string",
+      "pattern": "^urn:user:[a-z0-9_.-]+:[a-z0-9_.-]+$"
+    },
+    "date_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "object_class": {
+      "enum": [
+        "UAS",
+        "FIXED_WING",
+        "ROTORCRAFT",
+        "BALLOON",
+        "BIRD",
+        "VEHICLE",
+        "VESSEL",
+        "PERSON",
+        "UNKNOWN"
+      ],
+      "description": "Platform object classification (custom list)"
+    },
+    "standard_identity": {
+      "enum": [
+        "PENDING",
+        "UNKNOWN",
+        "ASSUMED_FRIEND",
+        "FRIEND",
+        "NEUTRAL",
+        "SUSPECT",
+        "HOSTILE"
+      ],
+      "description": "APP-6 / MIL-STD-2525 standard identity"
+    },
+    "emitter_category": {
+      "enum": [
+        "NO_INFO",
+        "LIGHT",
+        "SMALL",
+        "LARGE",
+        "HIGH_VORTEX_LARGE",
+        "HEAVY",
+        "HIGH_PERFORMANCE",
+        "ROTORCRAFT",
+        "GLIDER",
+        "LIGHTER_THAN_AIR",
+        "PARACHUTIST",
+        "ULTRALIGHT",
+        "UAV",
+        "SPACE",
+        "SURFACE_EMERGENCY",
+        "SURFACE_SERVICE",
+        "FIXED_OBSTACLE",
+        "CLUSTER_OBSTACLE",
+        "LINE_OBSTACLE"
+      ],
+      "description": "ADS-B emitter category (DO-260B; ASTERIX CAT021 I021/020)"
+    },
+    "sensor_type": {
+      "enum": [
+        "RADAR",
+        "RF",
+        "EO",
+        "IR",
+        "ACOUSTIC",
+        "RID",
+        "ADSB",
+        "MLAT",
+        "OTHER"
+      ]
+    },
+    "multihash": {
+      "type": "string",
+      "pattern": "^1220[0-9a-f]{64}$",
+      "description": "SHA2-256 as a hex-encoded multihash (prefix 1220), as used by the STAC File extension"
+    },
+    "entity_urn": {
+      "type": "string",
+      "pattern": "^urn:"
+    }
+  }
+}

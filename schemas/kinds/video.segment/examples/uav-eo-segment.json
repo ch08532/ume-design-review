@@ -1,0 +1,146 @@
+{
+  "type": "Feature",
+  "id": "urn:uuid:01926f3b-1a40-7e21-9c4d-2f1a8b6c3d70",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -75.7012,
+          45.418
+        ],
+        [
+          -75.6921,
+          45.4176
+        ],
+        [
+          -75.6915,
+          45.4238
+        ],
+        [
+          -75.7008,
+          45.4243
+        ],
+        [
+          -75.7012,
+          45.418
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "ume_version": "1",
+    "kind": "video.segment",
+    "schema": "urn:schema:video:fmv-segment:v1",
+    "datetime": "2026-09-23T17:45:10.000Z",
+    "start_datetime": "2026-09-23T17:45:10.000Z",
+    "end_datetime": "2026-09-23T17:45:20.000Z",
+    "time_source": "event",
+    "times": {
+      "source_at": "2026-09-23T17:45:20.020Z",
+      "sent_at": "2026-09-23T17:45:20.040Z",
+      "received_at": "2026-09-23T17:45:20.065Z",
+      "stored_at": "2026-09-23T17:45:21.310Z"
+    },
+    "expires_at": null,
+    "geometry_source": "observed",
+    "position_error_m": 25.0,
+    "domain": "LAND",
+    "height_range": {
+      "lower_m": 71.5,
+      "upper_m": 74.0,
+      "approximate": false
+    },
+    "source": {
+      "id": "urn:source:uav-eo-01",
+      "node": "site-a",
+      "event_id": "uav-eo-01:2026-09-23T17:45:10Z"
+    },
+    "provenance": {
+      "origin": "urn:source:uav-eo-01",
+      "derived_from": [],
+      "revision_of": null,
+      "produced_by": "mediamtx-segmenter",
+      "producer_version": "1.9.0",
+      "producer_org": "urn:org:dnd",
+      "config_hash": "12203f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f"
+    },
+    "security": {
+      "policy": "CAN",
+      "classification": "PROTECTED A",
+      "releasable_to": [
+        "CAN",
+        "USA"
+      ],
+      "caveats": [],
+      "originator": "urn:org:dnd"
+    },
+    "payload": {
+      "duration_s": 10.0,
+      "codec": "H.264",
+      "width_px": 1920,
+      "height_px": 1080,
+      "frame_rate": 30,
+      "sensor_band": "EO",
+      "klv": {
+        "standard": "MISB ST 0601",
+        "version": "19",
+        "packet_count": 300
+      },
+      "platform": {
+        "designation": "UAV-EO-01",
+        "call_sign": "RAVEN 21"
+      },
+      "sensor_position": [
+        -75.6965,
+        45.412,
+        450.0
+      ],
+      "mission_id": "OP-2026-0923-A"
+    }
+  },
+  "links": [
+    {
+      "rel": "service",
+      "href": "urn:service:media:uav-eo-01",
+      "type": "application/vnd.apple.mpegurl",
+      "title": "Live stream for this sensor"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "s3://mission-lake/fmv/uav-eo-01/2026/09/23/174510.ts",
+      "type": "video/mp2t",
+      "title": "Original segment with KLV (STANAG 4609)",
+      "roles": [
+        "data"
+      ],
+      "file:size": 18874368,
+      "file:checksum": "12209b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b"
+    },
+    "hls": {
+      "href": "s3://mission-lake/hls/uav-eo-01/2026/09/23/174510/index.m3u8",
+      "type": "application/vnd.apple.mpegurl",
+      "title": "Playback rendition",
+      "roles": [
+        "alternate"
+      ]
+    },
+    "thumbnail": {
+      "href": "s3://mission-lake/previews/uav-eo-01/2026/09/23/174510.jpg",
+      "type": "image/jpeg",
+      "roles": [
+        "thumbnail"
+      ],
+      "file:size": 48213
+    },
+    "klv": {
+      "href": "s3://mission-lake/klv/uav-eo-01/2026/09/23/174510.json",
+      "type": "application/json",
+      "title": "Decoded KLV metadata",
+      "roles": [
+        "metadata"
+      ]
+    }
+  }
+}

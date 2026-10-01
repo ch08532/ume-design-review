@@ -1,0 +1,17 @@
+# Type definition for zone.geofence. Ships with the product; deployment choices (retention, sync, exposure) are in deployments/.
+# envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | forbidden
+# entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
+kind: zone.geofence
+schema: urn:schema:zones:geofence:v1
+status: draft
+envelope:
+  time: span
+  geometry: required
+  geometry_source:
+  - defined
+  height_range: required
+  entity_id: required
+  required_assets: []
+source_event_id: Zone registry ID + version
+index_hints:
+- payload->>'zone_type'

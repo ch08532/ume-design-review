@@ -1,0 +1,18 @@
+# Type definition for sensor.status. Ships with the product; deployment choices (retention, sync, exposure) are in deployments/.
+# envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | forbidden
+# entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
+kind: sensor.status
+schema: urn:schema:sensing:sensor-status:v1
+status: draft
+envelope:
+  time: instant
+  geometry: required
+  geometry_source:
+  - sensor_coverage
+  height_range: optional
+  entity_id: required
+  entity_id_template: '{source.id}'
+  required_assets: []
+source_event_id: Heartbeat sequence
+index_hints:
+- payload->>'state'

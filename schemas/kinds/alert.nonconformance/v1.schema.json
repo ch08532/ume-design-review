@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:schema:alert:nonconformance:v1",
+  "title": "Payload: UTM non-conformance alert v1",
+  "description": "A track left the nominal volume of its operational intent.",
+  "allOf": [
+    {
+      "$ref": "urn:schema:alert:base:v1"
+    }
+  ],
+  "type": "object",
+  "required": [
+    "operational_intent_id",
+    "volume_id"
+  ],
+  "properties": {
+    "operational_intent_id": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/uuid"
+    },
+    "volume_id": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/uuid_urn"
+    },
+    "deviation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "horizontal_m": {
+          "type": "number",
+          "minimum": 0
+        },
+        "vertical_m": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    }
+  },
+  "unevaluatedProperties": false
+}

@@ -1,0 +1,17 @@
+# Type definition for track.command. Ships with the product; deployment choices (retention, sync, exposure) are in deployments/.
+# envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | forbidden
+# entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
+kind: track.command
+schema: urn:schema:tracks:command:v1
+status: draft
+envelope:
+  time: instant
+  geometry: optional
+  geometry_source:
+  - observed
+  height_range: forbidden
+  entity_id: optional
+  required_assets: []
+source_event_id: Console command ID
+index_hints:
+- payload->>'command'

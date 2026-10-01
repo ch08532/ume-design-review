@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:schema:tracks:fused-kinematics:v1",
+  "title": "Payload: fused track v1",
+  "description": "Fused track state. Position is the envelope geometry.",
+  "type": "object",
+  "required": [
+    "track_id"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "track_id": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/track_id"
+    },
+    "callsign": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 16
+    },
+    "object_class": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/object_class"
+    },
+    "identity": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/standard_identity"
+    },
+    "ground_speed_mps": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/speed_mps"
+    },
+    "course_deg": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/angle_deg"
+    },
+    "heading_deg": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/angle_deg"
+    },
+    "vertical_rate_mps": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/rate_mps"
+    },
+    "vertical_rate_type": {
+      "enum": [
+        "GEOMETRIC",
+        "PRESSURE"
+      ]
+    },
+    "pressure_altitude_ft": {
+      "type": "number"
+    },
+    "squawk": {
+      "type": "string",
+      "pattern": "^[0-7]{4}$",
+      "description": "ICAO Mode A code"
+    },
+    "target_address": {
+      "type": "string",
+      "pattern": "^[0-9A-F]{6}$",
+      "description": "ICAO 24-bit address"
+    },
+    "emitter_category": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/emitter_category"
+    },
+    "air_ground_state": {
+      "enum": [
+        "AIRBORNE",
+        "ON_GROUND",
+        "UNKNOWN"
+      ]
+    },
+    "fusion": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": {
+          "type": "string"
+        },
+        "contributing_sensor_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "covariance_diag_m2": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0
+          },
+          "minItems": 3,
+          "maxItems": 3
+        }
+      }
+    }
+  }
+}

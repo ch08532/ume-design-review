@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:schema:utm:intent-state:v1",
+  "title": "Payload: UTM operational intent state v1",
+  "description": "A state transition of an operational intent (ASTM F3548). entity_id identifies the operational intent.",
+  "type": "object",
+  "required": [
+    "operational_intent_id",
+    "version",
+    "state",
+    "uss"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "operational_intent_id": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/uuid"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "state": {
+      "enum": [
+        "Accepted",
+        "Activated",
+        "Nonconforming",
+        "Contingent",
+        "Ended"
+      ]
+    },
+    "previous_state": {
+      "enum": [
+        "Accepted",
+        "Activated",
+        "Nonconforming",
+        "Contingent"
+      ]
+    },
+    "uss": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/org_urn"
+    },
+    "reason": {
+      "type": "string"
+    }
+  }
+}

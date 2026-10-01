@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:schema:alert:zone-breach:v1",
+  "title": "Payload: zone breach alert v1",
+  "description": "A track entered, left or loitered in a zone.geofence.",
+  "allOf": [
+    {
+      "$ref": "urn:schema:alert:base:v1"
+    }
+  ],
+  "type": "object",
+  "required": [
+    "zone_id",
+    "breach_type"
+  ],
+  "properties": {
+    "zone_id": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/entity_urn",
+      "description": "entity_id of the zone (stable across zone revisions)"
+    },
+    "breach_type": {
+      "enum": [
+        "ENTRY",
+        "EXIT",
+        "DWELL"
+      ]
+    },
+    "dwell_s": {
+      "type": "number",
+      "minimum": 0
+    }
+  },
+  "unevaluatedProperties": false
+}

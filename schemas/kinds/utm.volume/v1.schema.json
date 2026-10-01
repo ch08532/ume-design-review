@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:schema:utm:conformance-volume:v1",
+  "title": "Payload: UTM operational intent volume v1",
+  "description": "One 4D volume of an operational intent (ASTM F3548 concepts). Footprint is the envelope geometry, time span is start/end_datetime, converted height is height_range; original altitudes are kept here. State changes are utm.intent_state records; a new intent version supersedes the previous volumes (revision_of).",
+  "type": "object",
+  "required": [
+    "operational_intent_id",
+    "version",
+    "volume_index",
+    "volume_type",
+    "altitude_lower",
+    "altitude_upper",
+    "uss"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "operational_intent_id": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/uuid"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "volume_index": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "volume_type": {
+      "enum": [
+        "nominal",
+        "off_nominal"
+      ],
+      "description": "nominal = conformance volume the aircraft must stay within; off_nominal = used when Nonconforming/Contingent"
+    },
+    "priority": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "altitude_lower": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/altitude"
+    },
+    "altitude_upper": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/altitude"
+    },
+    "uss": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/org_urn"
+    },
+    "operation_type": {
+      "enum": [
+        "VLOS",
+        "EVLOS",
+        "BVLOS"
+      ]
+    },
+    "uas_serial": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "x-personal-info": true,
+      "description": "ANSI/CTA-2063-A serial; links to an operator, so redacted by policy for users without personal-information access"
+    },
+    "operator_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "x-personal-info": true
+    }
+  }
+}

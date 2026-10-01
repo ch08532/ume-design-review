@@ -1,0 +1,135 @@
+{
+  "type": "Feature",
+  "id": "urn:uuid:01926f3b-2c51-7f32-ad5e-3a2b9c7d4e81",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -75.71,
+          45.415
+        ],
+        [
+          -75.68,
+          45.415
+        ],
+        [
+          -75.68,
+          45.435
+        ],
+        [
+          -75.71,
+          45.435
+        ],
+        [
+          -75.71,
+          45.415
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "ume_version": "1",
+    "kind": "imagery.ortho",
+    "schema": "urn:schema:imagery:ortho:v1",
+    "datetime": "2026-09-23T17:45:10.000Z",
+    "start_datetime": "2026-09-23T17:45:10.000Z",
+    "end_datetime": "2026-09-23T17:47:40.000Z",
+    "time_source": "event",
+    "times": {
+      "source_at": "2026-09-23T17:48:30.000Z",
+      "sent_at": "2026-09-23T17:48:31.200Z",
+      "received_at": "2026-09-23T17:48:31.400Z",
+      "stored_at": "2026-09-23T17:49:02.800Z"
+    },
+    "expires_at": null,
+    "geometry_source": "observed",
+    "position_error_m": 1.5,
+    "domain": "LAND",
+    "height_range": {
+      "lower_m": 110.0,
+      "upper_m": 110.0,
+      "approximate": false
+    },
+    "source": {
+      "id": "urn:source:skydio-x2-0402",
+      "node": "site-a",
+      "event_id": "capture:20260923-174510"
+    },
+    "provenance": {
+      "origin": "urn:source:skydio-x2-0402",
+      "derived_from": [],
+      "revision_of": null,
+      "produced_by": "ortho-pipeline",
+      "producer_version": "0.9.2",
+      "producer_org": "urn:org:dnd",
+      "config_hash": "1220a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3"
+    },
+    "security": {
+      "policy": "CAN",
+      "classification": "PROTECTED A",
+      "releasable_to": [
+        "CAN",
+        "USA",
+        "GBR"
+      ],
+      "caveats": [],
+      "originator": "urn:org:dnd"
+    },
+    "payload": {
+      "gsd": 0.025,
+      "bands": [
+        {
+          "name": "R",
+          "eo:common_name": "red"
+        },
+        {
+          "name": "G",
+          "eo:common_name": "green"
+        },
+        {
+          "name": "B",
+          "eo:common_name": "blue"
+        },
+        {
+          "name": "NIR",
+          "eo:common_name": "nir"
+        }
+      ],
+      "eo:cloud_cover": 2.0,
+      "proj:code": "EPSG:32618",
+      "proj:shape": [
+        9500,
+        14000
+      ],
+      "view:off_nadir": 3.5,
+      "view:sun_elevation": 28.4,
+      "platform": "skydio-x2",
+      "instruments": [
+        "vt300-z"
+      ],
+      "mission_id": "OP-2026-0923-A"
+    }
+  },
+  "links": [],
+  "assets": {
+    "data": {
+      "href": "s3://mission-lake/imagery/2026/09/23/recon_sector_b.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Orthomosaic (COG)",
+      "roles": [
+        "data"
+      ],
+      "file:size": 157286400,
+      "file:checksum": "1220c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4"
+    },
+    "thumbnail": {
+      "href": "s3://mission-lake/previews/imagery/2026/09/23/recon_sector_b.png",
+      "type": "image/png",
+      "roles": [
+        "thumbnail"
+      ],
+      "file:size": 34820
+    }
+  }
+}

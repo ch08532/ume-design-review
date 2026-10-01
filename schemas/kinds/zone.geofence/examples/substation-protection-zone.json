@@ -1,0 +1,99 @@
+{
+  "type": "Feature",
+  "id": "urn:uuid:01926f30-0000-7a01-8b02-0c0d0e0f1011",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -75.709,
+          45.3915
+        ],
+        [
+          -75.701,
+          45.3915
+        ],
+        [
+          -75.701,
+          45.396
+        ],
+        [
+          -75.709,
+          45.396
+        ],
+        [
+          -75.709,
+          45.3915
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "ume_version": "1",
+    "kind": "zone.geofence",
+    "schema": "urn:schema:zones:geofence:v1",
+    "entity_id": "urn:zone:northgrid:substation-b",
+    "datetime": "2026-01-01T00:00:00.000Z",
+    "start_datetime": "2026-01-01T00:00:00.000Z",
+    "end_datetime": null,
+    "time_source": "event",
+    "times": {
+      "source_at": "2025-12-15T14:00:00.000Z",
+      "sent_at": "2025-12-15T14:00:00.000Z",
+      "received_at": "2025-12-15T14:00:01.020Z",
+      "stored_at": "2025-12-15T14:00:01.090Z"
+    },
+    "expires_at": null,
+    "geometry_source": "defined",
+    "position_error_m": null,
+    "domain": "AIR",
+    "height_range": {
+      "lower_m": null,
+      "upper_m": 190.0,
+      "approximate": false
+    },
+    "source": {
+      "id": "urn:source:zone-registry",
+      "node": "core",
+      "event_id": "substation-b:v1"
+    },
+    "provenance": {
+      "origin": "urn:source:zone-registry",
+      "derived_from": [],
+      "revision_of": null,
+      "produced_by": "zone-admin",
+      "producer_version": "1.0.0",
+      "producer_org": "urn:org:northgrid-utility",
+      "config_hash": null
+    },
+    "security": {
+      "policy": "CORP",
+      "classification": "INTERNAL",
+      "releasable_to": [
+        "urn:org:northgrid-utility",
+        "urn:org:regional-police"
+      ],
+      "caveats": [],
+      "originator": "urn:org:northgrid-utility"
+    },
+    "payload": {
+      "zone_name": "Substation B protection zone",
+      "zone_type": "PROTECTED_SITE",
+      "authority": "urn:org:northgrid-utility",
+      "altitude_lower": {
+        "value": 0,
+        "reference": "SFC",
+        "units": "M"
+      },
+      "altitude_upper": {
+        "value": 150,
+        "reference": "AGL",
+        "units": "M"
+      },
+      "schedule": null,
+      "breach_severity": "SEVERE"
+    }
+  },
+  "links": [],
+  "assets": {}
+}

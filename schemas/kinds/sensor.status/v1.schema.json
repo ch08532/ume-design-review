@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:schema:sensing:sensor-status:v1",
+  "title": "Payload: sensor status v1",
+  "description": "Health and coverage of a sensor. Coverage is the envelope geometry (geometry_source: sensor_coverage); it also feeds location fallbacks for raw messages.",
+  "type": "object",
+  "required": [
+    "sensor_type",
+    "state",
+    "sensor_position"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "sensor_type": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/sensor_type"
+    },
+    "state": {
+      "enum": [
+        "OPERATIONAL",
+        "DEGRADED",
+        "OFFLINE",
+        "MAINTENANCE"
+      ]
+    },
+    "sensor_position": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/lon_lat_h"
+    },
+    "range_m": {
+      "type": "number",
+      "minimum": 0
+    },
+    "last_detection_at": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/date_time"
+    },
+    "software_version": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    }
+  }
+}

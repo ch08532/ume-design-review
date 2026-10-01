@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:schema:video:fmv-segment:v1",
+  "title": "Payload: FMV video segment v1",
+  "description": "Payload for kind video.segment. Time span is in the envelope (start/end_datetime), the ground footprint in the envelope geometry, and the files in assets.",
+  "type": "object",
+  "required": [
+    "duration_s",
+    "codec",
+    "width_px",
+    "height_px",
+    "frame_rate"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "duration_s": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "codec": {
+      "enum": [
+        "H.264",
+        "H.265",
+        "MPEG-2"
+      ]
+    },
+    "width_px": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "height_px": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "frame_rate": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "sensor_band": {
+      "enum": [
+        "EO",
+        "IR",
+        "MULTI"
+      ]
+    },
+    "klv": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "standard": {
+          "type": "string",
+          "description": "e.g. MISB ST 0601"
+        },
+        "version": {
+          "type": "string"
+        },
+        "packet_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "platform": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "designation": {
+          "type": "string"
+        },
+        "call_sign": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "sensor_position": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/lon_lat_h",
+      "description": "Sensor position at segment start; the envelope geometry is the ground footprint."
+    },
+    "mission_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

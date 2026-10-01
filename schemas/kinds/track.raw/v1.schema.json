@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:schema:tracks:raw-message:v1",
+  "title": "Payload: raw sensor message v1",
+  "description": "Metadata for one raw message. The bytes are on the backbone and, if kept, in a batch file referenced by the data asset (byte offset and length here).",
+  "type": "object",
+  "required": [
+    "format",
+    "byte_length"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "enum": [
+        "ASTERIX",
+        "SAPIENT",
+        "CAT_ON_TARGET",
+        "RID",
+        "VENDOR"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "description": "e.g. CAT021 for ASTERIX"
+    },
+    "byte_length": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "batch_offset": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "interface": {
+      "type": "string"
+    },
+    "port": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535
+    }
+  }
+}

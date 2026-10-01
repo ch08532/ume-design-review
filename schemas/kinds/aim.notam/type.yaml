@@ -1,0 +1,20 @@
+# Type definition for aim.notam. Ships with the product; deployment choices (retention, sync, exposure) are in deployments/.
+# envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | forbidden
+# entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
+kind: aim.notam
+schema: urn:schema:aim:notam:v1
+status: draft
+envelope:
+  time: span
+  geometry: required
+  geometry_source:
+  - defined
+  height_range: required
+  entity_id: required
+  entity_id_template: urn:notam:{payload.notam_id}
+  required_assets:
+  - data
+source_event_id: NOTAM ID (series/number/year)
+index_hints:
+- payload->>'location'
+- payload->>'q_code'

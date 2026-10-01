@@ -1,0 +1,18 @@
+# Type definition for utm.volume. Ships with the product; deployment choices (retention, sync, exposure) are in deployments/.
+# envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | forbidden
+# entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
+kind: utm.volume
+schema: urn:schema:utm:conformance-volume:v1
+status: draft
+envelope:
+  time: span
+  geometry: required
+  geometry_source:
+  - defined
+  height_range: required
+  entity_id: required
+  entity_id_template: urn:uuid:{payload.operational_intent_id}
+  required_assets: []
+source_event_id: operational_intent_id:version:volume_index
+index_hints:
+- payload->>'operational_intent_id'

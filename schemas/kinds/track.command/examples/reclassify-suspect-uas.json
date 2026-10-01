@@ -1,0 +1,74 @@
+{
+  "type": "Feature",
+  "id": "urn:uuid:01926f45-7a20-7b11-9c22-4d5e6f708192",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -75.7049,
+      45.3941
+    ]
+  },
+  "properties": {
+    "ume_version": "1",
+    "kind": "track.command",
+    "schema": "urn:schema:tracks:command:v1",
+    "entity_id": "urn:track:site-a:9507",
+    "datetime": "2026-09-23T18:05:40.000Z",
+    "start_datetime": null,
+    "end_datetime": null,
+    "time_source": "event",
+    "times": {
+      "source_at": "2026-09-23T18:05:40.000Z",
+      "sent_at": "2026-09-23T18:05:40.020Z",
+      "received_at": "2026-09-23T18:05:40.035Z",
+      "stored_at": "2026-09-23T18:05:40.044Z"
+    },
+    "expires_at": null,
+    "geometry_source": "observed",
+    "position_error_m": null,
+    "domain": "AIR",
+    "source": {
+      "id": "urn:source:console-03",
+      "node": "site-a",
+      "event_id": "cmd-55822"
+    },
+    "provenance": {
+      "origin": "urn:source:console-03",
+      "derived_from": [
+        "urn:uuid:01926f45-5c12-7d34-9e56-0a1b2c3d4e5f"
+      ],
+      "revision_of": null,
+      "produced_by": "operator-console",
+      "producer_version": "2.3.1",
+      "producer_org": "urn:org:northgrid-utility",
+      "config_hash": null
+    },
+    "security": {
+      "policy": "CORP",
+      "classification": "CONFIDENTIAL",
+      "releasable_to": [
+        "urn:org:northgrid-utility",
+        "urn:org:regional-police"
+      ],
+      "caveats": [
+        "security-ops"
+      ],
+      "originator": "urn:org:northgrid-utility"
+    },
+    "payload": {
+      "command": "RECLASSIFY",
+      "target_track_ids": [
+        "site-a:9507"
+      ],
+      "identity": "SUSPECT",
+      "object_class": "UAS",
+      "tags": [
+        "intrusion"
+      ],
+      "operator": "urn:user:northgrid:op-117",
+      "reason": "Unannounced UAS over Substation B"
+    }
+  },
+  "links": [],
+  "assets": {}
+}

@@ -1,0 +1,19 @@
+# Type definition for video.segment. Ships with the product; deployment choices (retention, sync, exposure) are in deployments/.
+# envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | forbidden
+# entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
+kind: video.segment
+schema: urn:schema:video:fmv-segment:v1
+status: draft
+envelope:
+  time: span
+  geometry: required
+  geometry_source:
+  - observed
+  - sensor
+  height_range: optional
+  entity_id: forbidden
+  required_assets:
+  - data
+source_event_id: Sensor ID + segment start time
+index_hints:
+- payload->>'mission_id'

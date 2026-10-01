@@ -1,0 +1,77 @@
+{
+  "type": "Feature",
+  "id": "urn:uuid:01926f3a-7d02-78b2-b1d6-857c0e66c91a",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -75.6975,
+      45.4213
+    ]
+  },
+  "properties": {
+    "ume_version": "1",
+    "kind": "sensor.detection",
+    "schema": "urn:schema:sensing:detection:v1",
+    "datetime": "2026-09-23T17:46:01.150Z",
+    "start_datetime": null,
+    "end_datetime": null,
+    "time_source": "event",
+    "times": {
+      "source_at": "2026-09-23T17:46:01.150Z",
+      "sent_at": "2026-09-23T17:46:01.160Z",
+      "received_at": "2026-09-23T17:46:01.172Z",
+      "stored_at": "2026-09-23T17:46:01.181Z"
+    },
+    "expires_at": null,
+    "geometry_source": "observed",
+    "position_error_m": 40.0,
+    "domain": "AIR",
+    "height_range": {
+      "lower_m": 3195.0,
+      "upper_m": 3195.0,
+      "approximate": false
+    },
+    "source": {
+      "id": "urn:source:radar-0012",
+      "node": "site-a",
+      "event_id": "plot:7781203"
+    },
+    "provenance": {
+      "origin": "urn:source:radar-0012",
+      "derived_from": [],
+      "revision_of": null,
+      "produced_by": "radar-adapter",
+      "producer_version": "2.0.3",
+      "producer_org": "urn:org:dnd",
+      "config_hash": null
+    },
+    "security": {
+      "policy": "CAN",
+      "classification": "UNCLASSIFIED",
+      "releasable_to": [
+        "CAN",
+        "USA",
+        "GBR",
+        "AUS",
+        "NZL"
+      ],
+      "caveats": [],
+      "originator": "urn:org:dnd"
+    },
+    "payload": {
+      "sensor_type": "RADAR",
+      "object_class": "FIXED_WING",
+      "class_confidence": 0.8,
+      "snr_db": 18.5,
+      "radar": {
+        "range_m": 10240.0,
+        "azimuth_deg": 352.4,
+        "elevation_deg": 17.6,
+        "radial_velocity_mps": -48.2,
+        "rcs_dbsm": 3.1
+      }
+    }
+  },
+  "links": [],
+  "assets": {}
+}

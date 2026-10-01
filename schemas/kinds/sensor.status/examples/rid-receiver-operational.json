@@ -1,0 +1,169 @@
+{
+  "type": "Feature",
+  "id": "urn:uuid:01926f40-0000-7c00-8d00-5e6f7a8b9c0d",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -75.705,
+          45.44292
+        ],
+        [
+          -75.68844,
+          45.44139
+        ],
+        [
+          -75.67302,
+          45.4369
+        ],
+        [
+          -75.65977,
+          45.42976
+        ],
+        [
+          -75.6496,
+          45.42046
+        ],
+        [
+          -75.64321,
+          45.40963
+        ],
+        [
+          -75.64103,
+          45.398
+        ],
+        [
+          -75.64321,
+          45.38637
+        ],
+        [
+          -75.6496,
+          45.37554
+        ],
+        [
+          -75.65977,
+          45.36624
+        ],
+        [
+          -75.67302,
+          45.3591
+        ],
+        [
+          -75.68844,
+          45.35461
+        ],
+        [
+          -75.705,
+          45.35308
+        ],
+        [
+          -75.72156,
+          45.35461
+        ],
+        [
+          -75.73698,
+          45.3591
+        ],
+        [
+          -75.75023,
+          45.36624
+        ],
+        [
+          -75.7604,
+          45.37554
+        ],
+        [
+          -75.76679,
+          45.38637
+        ],
+        [
+          -75.76897,
+          45.398
+        ],
+        [
+          -75.76679,
+          45.40963
+        ],
+        [
+          -75.7604,
+          45.42046
+        ],
+        [
+          -75.75023,
+          45.42976
+        ],
+        [
+          -75.73698,
+          45.4369
+        ],
+        [
+          -75.72156,
+          45.44139
+        ],
+        [
+          -75.705,
+          45.44292
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "ume_version": "1",
+    "kind": "sensor.status",
+    "schema": "urn:schema:sensing:sensor-status:v1",
+    "entity_id": "urn:source:rid-0012",
+    "datetime": "2026-09-23T18:00:00.000Z",
+    "start_datetime": null,
+    "end_datetime": null,
+    "time_source": "event",
+    "times": {
+      "source_at": "2026-09-23T18:00:00.000Z",
+      "sent_at": "2026-09-23T18:00:00.010Z",
+      "received_at": "2026-09-23T18:00:00.030Z",
+      "stored_at": "2026-09-23T18:00:00.041Z"
+    },
+    "expires_at": null,
+    "geometry_source": "sensor_coverage",
+    "position_error_m": null,
+    "domain": "AIR",
+    "source": {
+      "id": "urn:source:rid-0012",
+      "node": "site-a",
+      "event_id": "hb:880412"
+    },
+    "provenance": {
+      "origin": "urn:source:rid-0012",
+      "derived_from": [],
+      "revision_of": null,
+      "produced_by": "rid-adapter",
+      "producer_version": "1.1.0",
+      "producer_org": "urn:org:northgrid-utility",
+      "config_hash": null
+    },
+    "security": {
+      "policy": "CORP",
+      "classification": "INTERNAL",
+      "releasable_to": [
+        "urn:org:northgrid-utility",
+        "urn:org:regional-police"
+      ],
+      "caveats": [],
+      "originator": "urn:org:northgrid-utility"
+    },
+    "payload": {
+      "sensor_type": "RID",
+      "state": "OPERATIONAL",
+      "sensor_position": [
+        -75.705,
+        45.398,
+        75.0
+      ],
+      "range_m": 5000,
+      "last_detection_at": "2026-09-23T17:58:41.200Z",
+      "software_version": "4.2.0"
+    }
+  },
+  "links": [],
+  "assets": {}
+}

@@ -1,0 +1,19 @@
+# Type definition for sensor.detection. Ships with the product; deployment choices (retention, sync, exposure) are in deployments/.
+# envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | forbidden
+# entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
+kind: sensor.detection
+schema: urn:schema:sensing:detection:v1
+status: draft
+envelope:
+  time: instant
+  geometry: required
+  geometry_source:
+  - observed
+  - sensor
+  height_range: optional
+  entity_id: optional
+  required_assets: []
+source_event_id: Sensor-native plot or detection ID
+index_hints:
+- payload->>'sensor_type'
+- payload->>'object_class'

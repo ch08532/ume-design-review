@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:schema:imagery:ortho:v1",
+  "title": "Payload: orthorectified image v1",
+  "description": "Field names follow the STAC core, eo, proj and view extensions so records export directly as STAC Items. Footprint is the envelope geometry; files are assets.",
+  "type": "object",
+  "required": [
+    "gsd",
+    "bands"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "gsd": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Ground sample distance, metres (STAC)"
+    },
+    "bands": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "eo:common_name": {
+            "enum": [
+              "coastal",
+              "blue",
+              "green",
+              "red",
+              "yellow",
+              "pan",
+              "rededge",
+              "nir",
+              "nir08",
+              "nir09",
+              "cirrus",
+              "swir16",
+              "swir22",
+              "lwir",
+              "lwir11",
+              "lwir12"
+            ]
+          }
+        }
+      }
+    },
+    "eo:cloud_cover": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "proj:code": {
+      "type": "string",
+      "pattern": "^EPSG:[0-9]+$"
+    },
+    "proj:shape": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "minItems": 2,
+      "maxItems": 2,
+      "description": "[rows, columns]"
+    },
+    "view:off_nadir": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 90
+    },
+    "view:sun_elevation": {
+      "type": "number",
+      "minimum": -90,
+      "maximum": 90
+    },
+    "platform": {
+      "type": "string"
+    },
+    "instruments": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "mission_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

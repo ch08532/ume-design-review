@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:schema:alert:state-change:v1",
+  "title": "Payload: alert state change v1",
+  "description": "A change in an alert's state. entity_id is the alert's entity_id. The original alert record is never edited.",
+  "type": "object",
+  "required": [
+    "status",
+    "actor"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "status": {
+      "enum": [
+        "ACKNOWLEDGED",
+        "ESCALATED",
+        "RESOLVED",
+        "DISMISSED"
+      ]
+    },
+    "previous_status": {
+      "enum": [
+        "ACTIVE",
+        "ACKNOWLEDGED",
+        "ESCALATED"
+      ]
+    },
+    "actor": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/user_urn",
+      "x-personal-info": true
+    },
+    "note": {
+      "type": "string"
+    }
+  }
+}

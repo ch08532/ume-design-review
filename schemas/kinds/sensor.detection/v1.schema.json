@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:schema:sensing:detection:v1",
+  "title": "Payload: sensor detection v1",
+  "description": "A single-sensor detection before fusion. Estimated position is the envelope geometry. Sensor-specific details go in the matching sub-object.",
+  "type": "object",
+  "required": [
+    "sensor_type"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "sensor_type": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/sensor_type"
+    },
+    "object_class": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/object_class"
+    },
+    "class_confidence": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/confidence"
+    },
+    "snr_db": {
+      "type": "number"
+    },
+    "radar": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "range_m": {
+          "type": "number",
+          "minimum": 0
+        },
+        "azimuth_deg": {
+          "$ref": "urn:schema:fabric:common:v1#/$defs/angle_deg"
+        },
+        "elevation_deg": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "radial_velocity_mps": {
+          "type": "number"
+        },
+        "rcs_dbsm": {
+          "type": "number"
+        }
+      }
+    },
+    "rf": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "frequency_mhz": {
+          "type": "number",
+          "minimum": 0
+        },
+        "bandwidth_mhz": {
+          "type": "number",
+          "minimum": 0
+        },
+        "protocol": {
+          "type": "string"
+        },
+        "bearing_deg": {
+          "$ref": "urn:schema:fabric:common:v1#/$defs/angle_deg"
+        }
+      }
+    },
+    "rid": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "uas_id": {
+          "type": "string",
+          "x-personal-info": true
+        },
+        "uas_id_type": {
+          "enum": [
+            "SERIAL",
+            "CAA_REGISTRATION",
+            "UTM_ASSIGNED",
+            "SPECIFIC_SESSION"
+          ],
+          "description": "ASTM F3411 ID types"
+        },
+        "operator_location": {
+          "$ref": "urn:schema:fabric:common:v1#/$defs/lon_lat",
+          "x-personal-info": true
+        }
+      }
+    },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "EO/IR detections from video or imagery",
+      "properties": {
+        "frame_time": {
+          "$ref": "urn:schema:fabric:common:v1#/$defs/date_time"
+        },
+        "bbox_px": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "minItems": 4,
+          "maxItems": 4,
+          "description": "[x, y, width, height]"
+        },
+        "model": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

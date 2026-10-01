@@ -1,0 +1,54 @@
+# Deployment policy: retention, sync, OGC exposure and extra indexes per kind. Kinds not listed use defaults.
+# sync.priority: critical | operational | bulk;  sync.mode: full | downsample | latest | on_request
+deployment: utility-example
+description: Illustrative critical-infrastructure deployment with UTM and NOTAM feeds.
+defaults:
+  retention: P1Y
+  sync:
+    priority: operational
+    mode: full
+kinds:
+  track.fused:
+    retention: P30D
+    ogc_collection: tracks
+  alert.zone_breach:
+    retention: P3Y
+    ogc_collection: alerts
+    sync:
+      priority: critical
+      mode: full
+  alert.nonconformance:
+    retention: P3Y
+    ogc_collection: alerts
+    sync:
+      priority: critical
+      mode: full
+  alert.state_change:
+    retention: P3Y
+    sync:
+      priority: critical
+      mode: full
+  track.command:
+    retention: P3Y
+    sync:
+      priority: critical
+      mode: full
+  utm.volume:
+    retention: P1Y
+    ogc_collection: utm-volumes
+  utm.intent_state:
+    retention: P1Y
+  aim.notam:
+    retention: P1Y
+    ogc_collection: notams
+  zone.geofence:
+    retention: P3Y
+    ogc_collection: zones
+    indexes:
+    - payload->>'zone_name'
+  sensor.status:
+    retention: P90D
+    ogc_collection: sensors
+    sync:
+      priority: operational
+      mode: latest
