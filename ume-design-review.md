@@ -187,13 +187,6 @@ This keeps the difference clear:
 - `received_at` = when the platform received it
 - `stored_at` = when it was written to storage
 
-Not every source provides its own event time. A small `time_source` field records where `datetime` came from:
-
-- `event` — the source message carried its own event or observation time (for example an ASTERIX time of applicability or a KLV timestamp)
-- `source_at` — the source had no event time, so `datetime` falls back to `times.source_at`
-
-This lets latency and accuracy analysis tell measured event times apart from fallbacks.
-
 ### 6.2 Spatial
 
 The current UME design already supports GeoJSON geometry and different coordinate systems. The main area to improve is making sure location, height, confidence, and domain mean the same thing across all `kind` values. The current design defines geometry as longitude, latitude, altitude and also uses separate CRS and `altitude_type` fields.
@@ -227,7 +220,7 @@ Possible values could include:
 
 This makes it clear whether the geometry represents the actual object position, a defined area, or a sensor's location or coverage.
 
-There is deliberately no fallback to the processing node's location. A record with no meaningful location should have `geometry: null` (and `geometry_source: null`) rather than appear in spatial queries it has nothing to do with (S2).
+There is deliberately no fallback to the processing node's location. A record with no meaningful location should have `geometry: null` (and `geometry_source: null`).
 
 ### 6.3 Links
 
@@ -269,8 +262,6 @@ A relationship to another UME uses the same kind of identifier. Lineage is store
   ]
 }
 ```
-
-When the record is served to a client, GSS can turn this into a standard `derived_from` link (STAC), alongside generated `self`, `next`, and `prev` links. Storing lineage in one place means two copies cannot disagree.
 
 If a UME has a related file, the asset can contain its storage reference:
 
