@@ -1277,23 +1277,23 @@ The following standards and specifications are referenced in this review. These 
 
 | Standard / specification | Used for | Reference |
 |---|---|---|
-| **GeoJSON – RFC 7946** | Basic `Feature`, geometry, and coordinate structure | [RFC 7946 – GeoJSON](https://www.rfc-editor.org/info/rfc7946/?utm_source=chatgpt.com) |
-| **OGC Features and Geometries JSON (JSON-FG) 1.0** | Extends GeoJSON with features such as `place`, Prism geometry, time, and additional CRS support | [OGC JSON-FG 1.0](https://www.ogc.org/standards/json-fg/?utm_source=chatgpt.com) |
-| **OGC Simple Feature Access** | Defines common geometry concepts such as Point, LineString, Polygon, and geometry collections | [OGC Simple Feature Access](https://www.ogc.org/standards/sfa/?utm_source=chatgpt.com) |
-| **OGC API – Features** | API patterns for querying and returning geospatial features; also defines use of CRS84 and CRS84h | [OGC API – Features](https://www.ogc.org/standards/ogcapi-features/?utm_source=chatgpt.com) |
-| **RFC 3339** | Date and time format used by UME timestamps | [RFC 3339 – Date and Time on the Internet](https://www.rfc-editor.org/info/rfc3339/?utm_source=chatgpt.com) |
-| **RFC 8141** | URN syntax used for stable identifiers such as `urn:source:...` and `urn:org:...` | [RFC 8141 – Uniform Resource Names](https://www.rfc-editor.org/info/rfc8141/?utm_source=chatgpt.com) |
-| **RFC 9562** | UUIDs, including UUIDv7 used for UME record IDs | [RFC 9562 – UUIDs](https://www.rfc-editor.org/info/rfc9562/?utm_source=chatgpt.com) |
-| **ISO 3166-1** | Standard country codes such as `CAN`, `USA`, `GBR`, `AUS`, and `NZL` | [ISO 3166-1 Country Codes](https://www.iso.org/standard/72482.html?utm_source=chatgpt.com) |
-| **IANA Link Relations** | Standard values for link relationships such as `self`, `related`, `alternate`, `next`, and `prev` | [IANA Link Relations Registry](https://www.iana.org/assignments/link-relations?utm_source=chatgpt.com) |
-| **IANA Media Types** | Standard media types used by links and assets, such as `image/jpeg` and `video/mp2t` | [IANA Media Types Registry](https://www.iana.org/assignments/media-types?utm_source=chatgpt.com) |
-| **STAC** | Asset, link, imagery, and spatiotemporal metadata patterns | [STAC Specification](https://github.com/radiantearth/stac-spec?utm_source=chatgpt.com) |
-| **STAC File Info Extension** | Fields such as `file:size` and `file:checksum` | [STAC File Info Extension](https://github.com/stac-extensions/file?utm_source=chatgpt.com) |
-| **FIPS 180-4 – Secure Hash Standard** | SHA-256 checksums used for file and configuration integrity | [NIST FIPS 180-4](https://csrc.nist.gov/pubs/fips/180-4/upd1/final?utm_source=chatgpt.com) |
-| **W3C PROV** | Standard model for exchanging provenance and lineage information | [W3C PROV Overview](https://www.w3.org/TR/prov-overview/?utm_source=chatgpt.com) |
-| **CloudEvents** | Optional standard event metadata for messages sent over NATS, Kafka, MQTT, or other transports | [CloudEvents Specification](https://github.com/cloudevents/spec?utm_source=chatgpt.com) |
+| **GeoJSON – RFC 7946** | Basic `Feature`, geometry, and coordinate structure | [RFC 7946 – GeoJSON](https://www.rfc-editor.org/info/rfc7946/) |
+| **OGC Features and Geometries JSON (JSON-FG) 1.0** | Extends GeoJSON with features such as `place`, Prism geometry, time, and additional CRS support | [OGC JSON-FG 1.0](https://www.ogc.org/standards/json-fg/) |
+| **OGC Simple Feature Access** | Defines common geometry concepts such as Point, LineString, Polygon, and geometry collections | [OGC Simple Feature Access](https://www.ogc.org/standards/sfa/) |
+| **OGC API – Features** | API patterns for querying and returning geospatial features; also defines use of CRS84 and CRS84h | [OGC API – Features](https://www.ogc.org/standards/ogcapi-features/) |
+| **RFC 3339** | Date and time format used by UME timestamps | [RFC 3339 – Date and Time on the Internet](https://www.rfc-editor.org/info/rfc3339/) |
+| **RFC 8141** | URN syntax used for stable identifiers such as `urn:source:...` and `urn:org:...` | [RFC 8141 – Uniform Resource Names](https://www.rfc-editor.org/info/rfc8141/) |
+| **RFC 9562** | UUIDs, including UUIDv7 used for UME record IDs | [RFC 9562 – UUIDs](https://www.rfc-editor.org/info/rfc9562/) |
+| **ISO 3166-1** | Standard country codes such as `CAN`, `USA`, `GBR`, `AUS`, and `NZL` | [ISO 3166-1 Country Codes](https://www.iso.org/standard/72482.html) |
+| **IANA Link Relations** | Standard values for link relationships such as `self`, `related`, `alternate`, `next`, and `prev` | [IANA Link Relations Registry](https://www.iana.org/assignments/link-relations) |
+| **IANA Media Types** | Standard media types used by links and assets, such as `image/jpeg` and `video/mp2t` | [IANA Media Types Registry](https://www.iana.org/assignments/media-types) |
+| **STAC** | Asset, link, imagery, and spatiotemporal metadata patterns | [STAC Specification](https://github.com/radiantearth/stac-spec) |
+| **STAC File Info Extension** | Fields such as `file:size` and `file:checksum` | [STAC File Info Extension](https://github.com/stac-extensions/file) |
+| **FIPS 180-4 – Secure Hash Standard** | SHA-256 checksums used for file and configuration integrity | [NIST FIPS 180-4](https://csrc.nist.gov/pubs/fips/180-4/upd1/final) |
+| **W3C PROV** | Standard model for exchanging provenance and lineage information | [W3C PROV Overview](https://www.w3.org/TR/prov-overview/) |
+| **CloudEvents** | Optional standard event metadata for messages sent over NATS, Kafka, MQTT, or other transports | [CloudEvents Specification](https://github.com/cloudevents/spec) |
 | **Government of Canada Policy on Government Security** | Canadian security and classification policy referenced by the `CAN` security policy | [Policy on Government Security](https://www.tbs-sct.canada.ca/pol/doc-eng.aspx?id=16578&utm_source=chatgpt.com) |
-| **STANAG 4774** | NATO confidentiality metadata labelling | [NATO Standardization Agreements](https://www.nato.int/cps/en/natohq/stanag.htm?utm_source=chatgpt.com) |
-| **STANAG 4778** | Binding security labels to the data they protect | [NATO Standardization Agreements](https://www.nato.int/cps/en/natohq/stanag.htm?utm_source=chatgpt.com) |
-| **STANAG 4609** | Full-motion video and associated metadata | [NATO Standardization Agreements](https://www.nato.int/cps/en/natohq/stanag.htm?utm_source=chatgpt.com) |
+| **STANAG 4774** | NATO confidentiality metadata labelling | [NATO Standardization Agreements](https://www.nato.int/cps/en/natohq/stanag.htm) |
+| **STANAG 4778** | Binding security labels to the data they protect | [NATO Standardization Agreements](https://www.nato.int/cps/en/natohq/stanag.htm) |
+| **STANAG 4609** | Full-motion video and associated metadata | [NATO Standardization Agreements](https://www.nato.int/cps/en/natohq/stanag.htm) |
 
