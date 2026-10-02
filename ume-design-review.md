@@ -1293,7 +1293,6 @@ The following standards and specifications are referenced in this review. These 
 | **W3C PROV** | Standard model for exchanging provenance and lineage information | [W3C PROV Overview](https://www.w3.org/TR/prov-overview/) |
 | **CloudEvents** | Optional standard event metadata for messages sent over NATS, Kafka, MQTT, or other transports | [CloudEvents Specification](https://github.com/cloudevents/spec) |
 | **Government of Canada Policy on Government Security** | Canadian security and classification policy referenced by the `CAN` security policy | [Policy on Government Security](https://www.tbs-sct.canada.ca/pol/doc-eng.aspx?id=16578) |
-| **STANAG 4774** | NATO confidentiality metadata labelling | [NATO Standardization Agreements](https://www.nato.int/cps/en/natohq/stanag.htm) |
-| **STANAG 4778** | Binding security labels to the data they protect | [NATO Standardization Agreements](https://www.nato.int/cps/en/natohq/stanag.htm) |
-| **STANAG 4609** | Full-motion video and associated metadata | [NATO Standardization Agreements](https://www.nato.int/cps/en/natohq/stanag.htm) |
+| **STANAG 4774** | NATO confidentiality metadata labelling | [NATO Standardization Agreements](https://nso.nato.int/nso/nsdd/main/standards/stanag-details/8612/EN) |
+| **STANAG 4778** | Binding security labels to the data they protect | [NATO Standardization Agreements](https://nso.nato.int/nso/nsdd/main/standards/stanag-details/8613/EN) |
 
