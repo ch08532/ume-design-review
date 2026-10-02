@@ -534,7 +534,7 @@
         "event_id": {
           "type": "string",
           "minLength": 1,
-          "description": "Identity of the source event, unique per source.id. Derived from source-native data (message ID, sequence, or a content hash) so that every node or adapter receiving the same event produces the same value. (source.id, event_id) is the deduplication key."
+          "description": "Identity of the source event, unique per source.id. Derived from source-native data (message ID, sequence, or a content hash) so that every node or adapter receiving the same event produces the same value. (source.id, kind, event_id) is the deduplication key; kind is included because one source event can yield several records of different kinds."
         }
       }
     },

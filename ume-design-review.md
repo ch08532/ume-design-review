@@ -52,6 +52,8 @@ The findings in this review are linked back to the Data Fabric design principles
 | **DP7** | Provenance, lineage and versioning built-in | The platform should record where data came from, what it was derived from, and how it changed over time. |
 | **DP8** | Zero-trust security | Every access should be authenticated and authorized, using least privilege and encryption by default. |
 
+The DP2 description above is my proposed reading of "everything is spatiotemporal": every record has a time, but only records with a meaningful location have geometry (see S2). This should be confirmed with Jason, since it narrows the principle as originally written.
+
 ---
 
 ## 3. The envelope concept
@@ -185,6 +187,13 @@ This keeps the difference clear:
 - `received_at` = when the platform received it
 - `stored_at` = when it was written to storage
 
+Not every source provides its own event time. A small `time_source` field records where `datetime` came from:
+
+- `event` — the source message carried its own event or observation time (for example an ASTERIX time of applicability or a KLV timestamp)
+- `source_at` — the source had no event time, so `datetime` falls back to `times.source_at`
+
+This lets latency and accuracy analysis tell measured event times apart from fallbacks.
+
 ### 6.2 Spatial
 
 The current UME design already supports GeoJSON geometry and different coordinate systems. The main area to improve is making sure location, height, confidence, and domain mean the same thing across all `kind` values. The current design defines geometry as longitude, latitude, altitude and also uses separate CRS and `altitude_type` fields.
@@ -214,9 +223,11 @@ Possible values could include:
 - `defined` — the area was explicitly defined, such as a zone or UTM volume
 - `sensor_coverage` — the geometry represents the sensor coverage area
 - `sensor` — the geometry is the sensor location
-- `node` — the geometry is the node location
+- `aoi` — the geometry is a mission area of interest
 
-This makes it clear whether the geometry represents the actual object position or a fallback location.
+This makes it clear whether the geometry represents the actual object position, a defined area, or a sensor's location or coverage.
+
+There is deliberately no fallback to the processing node's location. A record with no meaningful location should have `geometry: null` (and `geometry_source: null`) rather than appear in spatial queries it has nothing to do with (S2).
 
 ### 6.3 Links
 
@@ -227,7 +238,7 @@ The current UME design already provides a useful way to link records to files, s
 | **L1** | Some links, such as `self` and preview URLs, are API-specific paths stored directly in the UME. These paths may change between deployments or APIs. | Store stable identifiers and references in the UME. Generate client-facing URLs when the record is returned through an API. |
 | **L2** | `next` and `previous` may not be known when a record is first created. Adding them later would require changing an existing record. | Calculate `next` and `previous` when the data is queried or returned to a client. |
 | **L3** | `derivedfrom` provides useful lineage, but finding all records that were created from a specific record may require searching through many link arrays. | Keep lineage in the UME, but consider an indexed database table for faster reverse-lineage searches. |
-| **L4** | `derivedfrom` is a custom link name. | Use standard link relation names where possible. |
+| **L4** | `derivedfrom` is a custom link name, and lineage, files, and service links all share the same `links` array. | Give each relationship one home: lineage in `provenance.derived_from`, files in `assets`, and only service or related-resource links in `links`, using IANA relation names (`service`, `related`, `alternate`, `describedby`). |
 | **L5** | `length` is included on every link, even when the link does not point to a file. | Make `length` optional and keep file size with the asset where it has a clear meaning. |
 
 #### IDs, references, and URLs
@@ -242,23 +253,24 @@ An important part of the design is the difference between **identifying somethin
 For example:
 
 ```json
-"id": "urn:uuid:18d2f5e1-8d23-41bb-b841-39659b8120e5"
+"id": "urn:uuid:01926f3a-8e10-7c32-b7e1-8890cf2b6941"
 ```
 
 This identifies a specific UME record. It does not mean that the record is stored at that location.
 
 The platform can use the ID to find the record wherever it is stored, for example in PostgreSQL, an archive, or another node.
 
-A relationship to another UME can use the same idea:
+A relationship to another UME uses the same kind of identifier. Lineage is stored once, in `provenance`:
 
 ```json
-"links": [
-  {
-    "rel": "derived_from",
-    "href": "urn:uuid:18d2f5e1-8d23-41bb-b841-39659b8120e5"
-  }
-]
+"provenance": {
+  "derived_from": [
+    "urn:uuid:01926f3a-7d01-7bb2-b841-39659b8120e5"
+  ]
+}
 ```
+
+When the record is served to a client, GSS can turn this into a standard `derived_from` link (STAC), alongside generated `self`, `next`, and `prev` links. Storing lineage in one place means two copies cannot disagree.
 
 If a UME has a related file, the asset can contain its storage reference:
 
@@ -296,10 +308,11 @@ The main recommendation is to separate **information about the UME record** from
 | **A2** | The current design does not clearly separate what the data represents, the schema that describes it, and the format of a file. | Use `kind` to describe what the record represents, `schema` to describe the payload structure, and asset `type` to describe the file format. |
 | **A3** | `lifecycle` mixes different ideas. `RAW` describes what the data is, while `PROCESSING` and `AVAILABLE` describe its current state. | Use `kind` or the payload to describe the type of data. Keep temporary processing state separate from the historical UME record. |
 | **A4** | `lifecycle` and `storage_tier` can change after the UME is written. | Keep changing state outside the UME record, for example in a separate `ume_state` table or storage-management service. |
-| **A5** | `source_id` is an integer, but the design does not define whether it is unique across all sites and nodes. | Use a stable source identifier such as `urn:source:site-a:flightline`. |
-| **A6** | `sha256` is included, but it is not clear exactly what data is being hashed. | Define the checksum as the hash of the exact asset bytes so every service calculates it the same way. |
+| **A5** | `source_id` is an integer, but the design does not define whether it is unique across all sites and nodes. | Use a stable identifier per device or producing service, such as `urn:source:flightline-0037`, and record the ingesting node separately in `source.node`. Keeping the site out of the source ID means a sensor that moves between sites keeps the same identity. |
+| **A6** | `sha256` is included, but it is not clear exactly what data is being hashed. | Define the checksum as the hash of the exact asset bytes so every service calculates it the same way. Store it as a SHA-256 multihash (`1220` followed by 64 hex characters), the format the STAC File extension uses for `file:checksum`. `config_hash` uses the same format. |
 | **A7** | Some checksum values in the examples appear to be placeholders. | Use real or clearly marked example checksum values and validate them as part of the test examples. |
 | **A8** | The relationship between the UME ID and asset UUID is not clearly defined. | Only give an asset its own ID when it needs a separate identity, such as when several UME records reference the same file. |
+| **A9** | There is no way to recognise the same source event arriving twice, for example when two adapters receive the same sensor message or a node replays data after reconnecting. The record ID cannot do this, because each producer generates its own. | Add `source.event_id`, derived from source-native data (a message ID or a natural key) so every adapter computes the same value. The deduplication key is `(source.id, kind, source.event_id)`. `kind` is included because one source event can produce several records, such as a `track.raw` and a `sensor.detection` from the same ASTERIX report. |
 
 ### 6.5 Provenance and versioning
 
@@ -318,14 +331,15 @@ A simple provenance structure could look like:
 
 ```json
 "provenance": {
-  "origin": "urn:source:site-a:flightline",
+  "origin": "urn:source:flightline-0037",
   "derived_from": [
     "urn:uuid:01926f3a-7d01-7bb2-b841-39659b8120e5"
   ],
   "revision_of": null,
   "produced_by": "omnitrack-engine",
   "producer_version": "3.4.1",
-  "config_hash": "sha256:..."
+  "producer_org": "urn:org:dnd",
+  "config_hash": "12209c9c...9c"
 }
 ```
 
@@ -334,7 +348,8 @@ The key difference is:
 - `derived_from` = which records were used to create this one
 - `revision_of` = which earlier record this one corrects or replaces
 - `produced_by` = which service created it
-- `producer_version` / `config_hash` = which software and configuration were used
+- `producer_org` = which organization produced it (which may differ from the security `originator`, 7.3)
+- `producer_version` / `config_hash` = which software and configuration were used (`config_hash` is a SHA-256 multihash, A6)
 
 This makes it easier to understand how a result was produced without changing older records.
 
@@ -403,6 +418,8 @@ start_datetime  timestamptz
 end_datetime    timestamptz
 geometry        PostGIS geometry
 source_id       text
+source_node     text
+source_event_id text
 security        jsonb / columns
 provenance      jsonb
 payload         jsonb
@@ -426,9 +443,27 @@ USING GIST (geometry);
 -- Kind and time queries
 CREATE INDEX idx_ume_kind_datetime
 ON ume_records (kind, datetime);
+
+-- Duplicate detection (A9)
+CREATE UNIQUE INDEX idx_ume_source_event
+ON ume_records (source_id, kind, source_event_id);
 ```
 
 Additional payload indexes can be created from the `index_hints` defined for each `kind`.
+
+If the table is partitioned by time (for example a TimescaleDB hypertable on `datetime`), unique indexes must include the partition column, so the duplicate-detection index becomes `(source_id, kind, source_event_id, datetime)`. That only catches duplicates if every adapter derives `datetime` the same way for the same event, which the type definition for each `kind` should state.
+
+#### Latest-state view
+
+The UME history is append-only, but operational screens usually need the current state: where each track is now, which alerts are open, the status of each sensor. A small latest-state table (or materialized view) holds the most recent record for each entity, while the full history stays unchanged.
+
+It should be keyed on **`(entity_id, kind)`**, not `entity_id` alone. Several kinds can describe the same entity:
+
+- a `track.fused` update and a `track.command` both refer to the same track
+- an `alert.zone_breach` and its `alert.state_change` both refer to the same alert
+- several `utm.volume` records and the `utm.intent_state` records all refer to the same operational intent
+
+Keyed on `entity_id` alone, an operator command would replace the track's position, and an acknowledgement would replace the alert itself. Kinds that have several current records per entity (such as the volumes of one operational intent) can add a sub-key in their type definition, for example `payload.volume_index`.
 
 ### 6.8 Messaging
 
@@ -701,7 +736,7 @@ This example shows how a fused track from a sensor, such as ADS-B, could be repr
       "produced_by": "omnitrack-engine",
       "producer_version": "3.4.1",
       "producer_org": "urn:org:dnd",
-      "config_hash": "12209c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c"
+      "config_hash": "12209c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c"
     },
     "security": {
       "policy": "CAN",
@@ -753,13 +788,13 @@ The table below shows how fields in the current UME design would map to the prop
 | `temporal.observed_at` | `times.received_at` |
 | `temporal.ingested_at` | `times.stored_at` |
 | Not currently defined | `datetime`, `start_datetime`, and `end_datetime` describe when the record applies. |
-| `temporal.valid_until` | `expires_at` |
+| `temporal.valid_until` | `end_datetime` when it means the data stops being valid; `expires_at` only when it is a per-record retention override (T5). |
 | `temporal.index` / `spatial.track.index` | Removed. These are no longer needed in the record. |
 | `spatial.geometry` | Moves to the top-level `geometry` field. It can be 2D or 3D, or `null` when the `kind` allows it. |
 | Geometry height / `altitude_type` | Height is stored as the third geometry coordinate for points and lines. Volumes use a Prism in `place`. Original altitude values can still be kept in the payload. |
 | `spatial.crs` | Uses a fixed CRS: OGC CRS84h, meaning longitude, latitude, and WGS-84 ellipsoidal height. |
 | `spatial.confidence` | Replaced by `position_error_m` and `geometry_source`. |
-| `spatial.domain` | Becomes `domain`, used only for physical domains such as `AIR`, `LAND`, or `SEA`. |
+| `spatial.domain` | Becomes `domain`, used only for physical domains such as `AIR`, `LAND`, `SEA_SURFACE`, `SUBSURFACE`, or `SPACE`. |
 | `spatial.track.*` | Track-specific fields move into `payload`, based on the schema for that `kind`. |
 | `spatial.track.payload` raw binary data | Raw data stays on the messaging backbone or is stored as a file asset using a `track.raw` record. |
 | `reference.links` | Files move to `assets`. `links` is kept for links to services or other resources. |
@@ -1270,6 +1305,7 @@ In this example, the volume covers the same 2D area from **45 m to 165 m**.
 - **Volumes have clear lower and upper limits.** JSON-FG Prism represents a 2D area between two heights, which matches the way UTM volumes, NOTAMs, and geofences are commonly described.
 - **Standard GeoJSON clients still work.** Clients that do not understand JSON-FG can continue using the normal `geometry` member. For a volume, they see the 2D footprint and can ignore `place`.
 - **3D-aware clients get the full model.** Clients that support JSON-FG can use the Prism in `place` to understand the complete 3D volume.
+
 
 ## 13. Standards references
 

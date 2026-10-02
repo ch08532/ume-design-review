@@ -9,7 +9,7 @@ Checks, in order:
   1. Every *.schema.json is a valid JSON Schema; all are loaded into a local registry by $id.
   2. Each example passes the envelope schema and its payload schema.
   3. Each example meets the normative cross-field rules (R1-R6, R10-R11) and its kind's type definition (R7-R9).
-  4. No two examples share a deduplication key (source.id, source.event_id).
+  4. No two examples share a deduplication key (source.id, kind, source.event_id).
 """
 import json, re, sys
 from datetime import datetime
@@ -157,7 +157,7 @@ for tf in sorted(sroot.glob("kinds/*/type.yaml")):
         errors.extend(f"{where}: payload: {e.message}" for e in payload.iter_errors(rec["properties"]["payload"]))
         if env_errs: continue
         normative_rules(rec, where); type_rules(rec, td, where)
-        key = (rec["properties"]["source"]["id"], rec["properties"]["source"]["event_id"])
+        key = (rec["properties"]["source"]["id"], rec["properties"]["kind"], rec["properties"]["source"]["event_id"])
         if key in dedup: errors.append(f"{where}: duplicate source event {key} (also {dedup[key]})")
         dedup[key] = where
 
