@@ -1292,7 +1292,7 @@ The following standards and specifications are referenced in this review. These 
 | **FIPS 180-4 – Secure Hash Standard** | SHA-256 checksums used for file and configuration integrity | [NIST FIPS 180-4](https://csrc.nist.gov/pubs/fips/180-4/upd1/final) |
 | **W3C PROV** | Standard model for exchanging provenance and lineage information | [W3C PROV Overview](https://www.w3.org/TR/prov-overview/) |
 | **CloudEvents** | Optional standard event metadata for messages sent over NATS, Kafka, MQTT, or other transports | [CloudEvents Specification](https://github.com/cloudevents/spec) |
-| **Government of Canada Policy on Government Security** | Canadian security and classification policy referenced by the `CAN` security policy | [Policy on Government Security](https://www.tbs-sct.canada.ca/pol/doc-eng.aspx?id=16578&utm_source=chatgpt.com) |
+| **Government of Canada Policy on Government Security** | Canadian security and classification policy referenced by the `CAN` security policy | [Policy on Government Security](https://www.tbs-sct.canada.ca/pol/doc-eng.aspx?id=16578) |
 | **STANAG 4774** | NATO confidentiality metadata labelling | [NATO Standardization Agreements](https://www.nato.int/cps/en/natohq/stanag.htm) |
 | **STANAG 4778** | Binding security labels to the data they protect | [NATO Standardization Agreements](https://www.nato.int/cps/en/natohq/stanag.htm) |
 | **STANAG 4609** | Full-motion video and associated metadata | [NATO Standardization Agreements](https://www.nato.int/cps/en/natohq/stanag.htm) |
