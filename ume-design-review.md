@@ -1297,6 +1297,3 @@ The following standards and specifications are referenced in this review. These 
 | **STANAG 4778** | Binding security labels to the data they protect | [NATO Standardization Agreements](https://www.nato.int/cps/en/natohq/stanag.htm?utm_source=chatgpt.com) |
 | **STANAG 4609** | Full-motion video and associated metadata | [NATO Standardization Agreements](https://www.nato.int/cps/en/natohq/stanag.htm?utm_source=chatgpt.com) |
 
-Some NATO standards are not available as unrestricted public documents. The NATO Standardization Office catalogue should be used to find the applicable edition and determine whether access is available.
-
-These references are included for convenience. The applicable version and profile should still be confirmed when a standard is formally adopted by the Data Fabric.
