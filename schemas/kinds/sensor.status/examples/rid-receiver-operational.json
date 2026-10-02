@@ -108,6 +108,7 @@
       ]
     ]
   },
+  "place": null,
   "properties": {
     "ume_version": "1",
     "kind": "sensor.status",

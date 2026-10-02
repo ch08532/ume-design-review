@@ -7,27 +7,33 @@
       [
         [
           -75.7012,
-          45.418
+          45.418,
+          72.0
         ],
         [
           -75.6921,
-          45.4176
+          45.4176,
+          71.5
         ],
         [
           -75.6915,
-          45.4238
+          45.4238,
+          74.0
         ],
         [
           -75.7008,
-          45.4243
+          45.4243,
+          73.5
         ],
         [
           -75.7012,
-          45.418
+          45.418,
+          72.0
         ]
       ]
     ]
   },
+  "place": null,
   "properties": {
     "ume_version": "1",
     "kind": "video.segment",
@@ -46,11 +52,6 @@
     "geometry_source": "observed",
     "position_error_m": 25.0,
     "domain": "LAND",
-    "height_range": {
-      "lower_m": 71.5,
-      "upper_m": 74.0,
-      "approximate": false
-    },
     "source": {
       "id": "urn:source:uav-eo-01",
       "node": "site-a",

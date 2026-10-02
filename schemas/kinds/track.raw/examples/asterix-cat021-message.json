@@ -108,6 +108,7 @@
       ]
     ]
   },
+  "place": null,
   "properties": {
     "ume_version": "1",
     "kind": "track.raw",
@@ -129,7 +130,7 @@
     "source": {
       "id": "urn:source:flightline-0037",
       "node": "site-a",
-      "event_id": "012/037:491208"
+      "event_id": "012/037:C0FFEE:8187021"
     },
     "provenance": {
       "origin": "urn:source:flightline-0037",

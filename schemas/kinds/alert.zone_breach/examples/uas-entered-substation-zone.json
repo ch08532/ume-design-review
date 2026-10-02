@@ -5,9 +5,11 @@
     "type": "Point",
     "coordinates": [
       -75.7052,
-      45.3938
+      45.3938,
+      95.0
     ]
   },
+  "place": null,
   "properties": {
     "ume_version": "1",
     "kind": "alert.zone_breach",
@@ -27,11 +29,6 @@
     "geometry_source": "observed",
     "position_error_m": 15.0,
     "domain": "AIR",
-    "height_range": {
-      "lower_m": 95.0,
-      "upper_m": 95.0,
-      "approximate": false
-    },
     "source": {
       "id": "urn:source:alert-engine-01",
       "node": "site-a",

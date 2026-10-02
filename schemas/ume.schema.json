@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:schema:fabric:ume:v1",
-  "title": "Universal Metadata Envelope (UME) v1 — JSON profile",
-  "description": "Normative JSON representation of a Data Fabric record, as a GeoJSON Feature. The logical model is independent of this profile; Protobuf and SQL are other representations. The payload is validated separately against the schema named in properties.schema. Cross-field rules are checked by tools/validate.py.",
+  "title": "Universal Metadata Envelope (UME) v1 — JSON profile (GeoJSON / JSON-FG)",
+  "description": "Normative JSON representation of a Data Fabric record, as a GeoJSON Feature with JSON-FG extensions (place, Prism, coordRefSys) for 3D. The logical model is independent of this profile; Protobuf and SQL are other representations. The payload is validated separately against the schema named in properties.schema. Cross-field rules are checked by tools/validate.py.",
   "type": "object",
   "required": [
     "type",
@@ -20,6 +20,21 @@
     },
     "geometry": {
       "$ref": "#/$defs/geometry"
+    },
+    "place": {
+      "description": "JSON-FG place: geometry GeoJSON can't express. Used for volumes (Prism); null otherwise.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/prism"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "coordRefSys": {
+      "const": "http://www.opengis.net/def/crs/OGC/0/CRS84h",
+      "description": "JSON-FG coordinate reference system: lon, lat, ellipsoidal height in metres."
     },
     "properties": {
       "$ref": "#/$defs/umeProperties"
@@ -431,15 +446,9 @@
             null
           ]
         },
-        "height_range": {
-          "oneOf": [
-            {
-              "$ref": "#/$defs/heightRange"
-            },
-            {
-              "type": "null"
-            }
-          ]
+        "vertical_approximate": {
+          "type": "boolean",
+          "description": "True when heights (z or Prism limits) were converted using assumptions, e.g. flight levels via the standard atmosphere."
         },
         "source": {
           "$ref": "#/$defs/source"
@@ -500,33 +509,6 @@
         },
         "stored_at": {
           "$ref": "#/$defs/nullableDateTime"
-        }
-      }
-    },
-    "heightRange": {
-      "description": "Vertical extent in WGS84 ellipsoidal metres. Points have lower_m == upper_m. A conservative superset for converted volumes; exact values stay in the payload. null = unbounded. lower_m <= upper_m is checked by the validator.",
-      "type": "object",
-      "required": [
-        "lower_m",
-        "upper_m",
-        "approximate"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "lower_m": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "upper_m": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "approximate": {
-          "type": "boolean"
         }
       }
     },
@@ -803,7 +785,7 @@
     "position": {
       "type": "array",
       "minItems": 2,
-      "maxItems": 2,
+      "maxItems": 3,
       "prefixItems": [
         {
           "type": "number",
@@ -814,9 +796,12 @@
           "type": "number",
           "minimum": -90,
           "maximum": 90
+        },
+        {
+          "type": "number"
         }
       ],
-      "description": "[lon, lat], WGS84 (OGC:CRS84). Height is never in geometry; it is in height_range."
+      "description": "[lon, lat] or [lon, lat, h]: WGS-84, h in metres above the ellipsoid (OGC:CRS84 / CRS84h, as GeoJSON defines). All positions in one geometry must have the same dimension (validator rule R10)."
     },
     "linearRing": {
       "type": "array",
@@ -989,7 +974,7 @@
       ]
     },
     "geometry": {
-      "description": "2D footprint or position, or null for non-spatial kinds. Whether it is required is set per kind.",
+      "description": "GeoJSON geometry, 2D or 3D, or null for non-spatial kinds. For volumes this is the 2D footprint, and the full volume is in place.",
       "oneOf": [
         {
           "$ref": "#/$defs/simpleGeometry"
@@ -999,6 +984,54 @@
         },
         {
           "type": "null"
+        }
+      ]
+    },
+    "prism": {
+      "description": "JSON-FG Prism: a 2D base extruded between lower and upper heights (metres above the WGS-84 ellipsoid). An omitted limit is unbounded. lower <= upper and base == geometry are checked by the validator.",
+      "type": "object",
+      "required": [
+        "type",
+        "base"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "Prism"
+        },
+        "base": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/polygon"
+            },
+            {
+              "$ref": "#/$defs/multiPolygon"
+            },
+            {
+              "$ref": "#/$defs/point"
+            },
+            {
+              "$ref": "#/$defs/lineString"
+            }
+          ]
+        },
+        "lower": {
+          "type": "number"
+        },
+        "upper": {
+          "type": "number"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "lower"
+          ]
+        },
+        {
+          "required": [
+            "upper"
+          ]
         }
       ]
     }

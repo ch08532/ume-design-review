@@ -28,6 +28,39 @@
       ]
     ]
   },
+  "place": {
+    "type": "Prism",
+    "base": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -75.723,
+            45.398
+          ],
+          [
+            -75.7085,
+            45.398
+          ],
+          [
+            -75.7085,
+            45.4065
+          ],
+          [
+            -75.723,
+            45.4065
+          ],
+          [
+            -75.723,
+            45.398
+          ]
+        ]
+      ]
+    },
+    "lower": 45.0,
+    "upper": 165.0
+  },
+  "coordRefSys": "http://www.opengis.net/def/crs/OGC/0/CRS84h",
   "properties": {
     "ume_version": "1",
     "kind": "utm.volume",
@@ -47,11 +80,6 @@
     "geometry_source": "defined",
     "position_error_m": null,
     "domain": "AIR",
-    "height_range": {
-      "lower_m": 45.0,
-      "upper_m": 165.0,
-      "approximate": false
-    },
     "source": {
       "id": "urn:source:uss-alpha",
       "node": "core",

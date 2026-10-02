@@ -1,5 +1,6 @@
 # Type definition for alert.state_change.
 # envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | forbidden
+# z: heights in geometry positions; place: a JSON-FG Prism for volumes.
 # entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
 kind: alert.state_change
 schema: urn:schema:alert:state-change:v1
@@ -8,7 +9,8 @@ envelope:
   time: instant
   geometry: forbidden
   geometry_source: []
-  height_range: forbidden
+  z: forbidden
+  place: forbidden
   entity_id: required
   required_assets: []
 source_event_id: Console action ID

@@ -5,9 +5,11 @@
     "type": "Point",
     "coordinates": [
       -75.6975,
-      45.4213
+      45.4213,
+      3195.0
     ]
   },
+  "place": null,
   "properties": {
     "ume_version": "1",
     "kind": "sensor.detection",
@@ -26,11 +28,6 @@
     "geometry_source": "observed",
     "position_error_m": 40.0,
     "domain": "AIR",
-    "height_range": {
-      "lower_m": 3195.0,
-      "upper_m": 3195.0,
-      "approximate": false
-    },
     "source": {
       "id": "urn:source:radar-0012",
       "node": "site-a",

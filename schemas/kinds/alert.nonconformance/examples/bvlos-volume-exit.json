@@ -5,9 +5,11 @@
     "type": "Point",
     "coordinates": [
       -75.7242,
-      45.4012
+      45.4012,
+      96.0
     ]
   },
+  "place": null,
   "properties": {
     "ume_version": "1",
     "kind": "alert.nonconformance",
@@ -27,11 +29,6 @@
     "geometry_source": "observed",
     "position_error_m": 10.0,
     "domain": "AIR",
-    "height_range": {
-      "lower_m": 96.0,
-      "upper_m": 96.0,
-      "approximate": false
-    },
     "source": {
       "id": "urn:source:conformance-monitor-01",
       "node": "core",

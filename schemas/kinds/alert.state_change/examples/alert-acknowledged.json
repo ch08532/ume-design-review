@@ -2,6 +2,7 @@
   "type": "Feature",
   "id": "urn:uuid:01926f45-6b00-7a10-8b20-9c0d1e2f3a4b",
   "geometry": null,
+  "place": null,
   "properties": {
     "ume_version": "1",
     "kind": "alert.state_change",

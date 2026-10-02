@@ -1,5 +1,6 @@
 # Type definition for imagery.ortho.
 # envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | forbidden
+# z: heights in geometry positions; place: a JSON-FG Prism for volumes.
 # entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
 kind: imagery.ortho
 schema: urn:schema:imagery:ortho:v1
@@ -9,7 +10,8 @@ envelope:
   geometry: required
   geometry_source:
   - observed
-  height_range: optional
+  z: optional
+  place: forbidden
   entity_id: forbidden
   required_assets:
   - data

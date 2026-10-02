@@ -7,27 +7,33 @@
       [
         [
           -75.71,
-          45.415
+          45.415,
+          110.0
         ],
         [
           -75.68,
-          45.415
+          45.415,
+          110.0
         ],
         [
           -75.68,
-          45.435
+          45.435,
+          110.0
         ],
         [
           -75.71,
-          45.435
+          45.435,
+          110.0
         ],
         [
           -75.71,
-          45.415
+          45.415,
+          110.0
         ]
       ]
     ]
   },
+  "place": null,
   "properties": {
     "ume_version": "1",
     "kind": "imagery.ortho",
@@ -46,11 +52,6 @@
     "geometry_source": "observed",
     "position_error_m": 1.5,
     "domain": "LAND",
-    "height_range": {
-      "lower_m": 110.0,
-      "upper_m": 110.0,
-      "approximate": false
-    },
     "source": {
       "id": "urn:source:skydio-x2-0402",
       "node": "site-a",

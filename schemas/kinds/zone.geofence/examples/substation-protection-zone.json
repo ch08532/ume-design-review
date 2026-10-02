@@ -28,6 +28,38 @@
       ]
     ]
   },
+  "place": {
+    "type": "Prism",
+    "base": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -75.709,
+            45.3915
+          ],
+          [
+            -75.701,
+            45.3915
+          ],
+          [
+            -75.701,
+            45.396
+          ],
+          [
+            -75.709,
+            45.396
+          ],
+          [
+            -75.709,
+            45.3915
+          ]
+        ]
+      ]
+    },
+    "upper": 190.0
+  },
+  "coordRefSys": "http://www.opengis.net/def/crs/OGC/0/CRS84h",
   "properties": {
     "ume_version": "1",
     "kind": "zone.geofence",
@@ -47,11 +79,6 @@
     "geometry_source": "defined",
     "position_error_m": null,
     "domain": "AIR",
-    "height_range": {
-      "lower_m": null,
-      "upper_m": 190.0,
-      "approximate": false
-    },
     "source": {
       "id": "urn:source:zone-registry",
       "node": "core",

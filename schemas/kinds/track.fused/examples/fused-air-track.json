@@ -5,9 +5,11 @@
     "type": "Point",
     "coordinates": [
       -75.6972,
-      45.4215
+      45.4215,
+      3200.5
     ]
   },
+  "place": null,
   "properties": {
     "ume_version": "1",
     "kind": "track.fused",
@@ -27,11 +29,6 @@
     "geometry_source": "observed",
     "position_error_m": 12.0,
     "domain": "AIR",
-    "height_range": {
-      "lower_m": 3200.5,
-      "upper_m": 3200.5,
-      "approximate": false
-    },
     "source": {
       "id": "urn:source:omnitrack-01",
       "node": "site-a",
