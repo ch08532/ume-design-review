@@ -16,6 +16,7 @@ Review of the **Universal Metadata Envelope (UME) Design** against the Data Fabr
 10. [Schema catalogue](#10-schema-catalogue)
 11. [Example use cases using the UME](#11-example-use-cases-using-the-ume)
 12. [Vertical model](#12-vertical-model)
+13. [Standards references](#13-standards-references)
 ---
 
 ## 1. Summary
@@ -993,102 +994,216 @@ These are only example `kind` values, created to show how UME could work with di
 
 ---
 
-## 11. Example Use Cases using the UME
+## 11. Example UME use cases
 
-The following are my personal thoughts on how one can use the UME to capture real world concepts.  
+The following examples show how the proposed UME structure could represent different types of real-world data.
 
-Each kind has an example in `kinds/<kind>/examples/`. The examples are linked, so they also show lineage, entities and state across kinds:
+They are examples only and are not meant to define the final list of UME `kind` values.
 
+Each `kind` has an example under:
+
+```text
+kinds/<kind>/examples/
 ```
+
+The examples are linked together to show how source data, derived data, alerts, state changes, and operator actions can relate to one another.
+
+```text
 track.raw ────────┐
-                  ├─► track.fused                                    ISR chain (CAN labels)
+                  ├─► track.fused
 sensor.detection ─┘
 
-zone.geofence ─► alert.zone_breach ─► alert.state_change (acknowledged)
-                        └────────────► track.command (reclassify)     site protection (CORP labels)
+zone.geofence ─► alert.zone_breach ─► alert.state_change
+                        └────────────► track.command
 
 utm.volume ─┬─► alert.nonconformance
-            └── utm.intent_state (Accepted → Activated)               UTM (CORP labels)
+            └── utm.intent_state
 ```
+
+The main idea is that each UME record represents one event, observation, state change, or defined object. Related records are connected using identifiers and provenance rather than putting everything into one large record.
 
 ### 11.1 Fused track and its inputs
 
-`track.fused/examples/fused-air-track.json` is the track in section 8.
+`track.fused/examples/fused-air-track.json` is the fused-track example shown in Section 8.
 
-- **Geometry:** a 3D point, `[-75.6972, 45.4215, 3200.5]`, with height above the WGS-84 ellipsoid.
-- **Entity:** `urn:track:site-a:9421`, derived from the payload `track_id`, so every update of this track shares it.
-- **Source:** `urn:source:omnitrack-01` (the Trackgen instance), ingested at `site-a`, with event ID `site-a:9421:118734` (track and update sequence).
-- **Provenance:** `derived_from` the raw ASTERIX message and the radar plot; `producer_org` DND; `revision_of` null, since an update is a new observation, not a correction (V2).
-- **Security:** CAN, UNCLASSIFIED, five nations, consistent with its inputs.
+It shows how data from several sources can be combined into a new track observation.
+
+- **Position** — stored as a 3D point: `[-75.6972, 45.4215, 3200.5]`. The third value is height above the WGS-84 ellipsoid.
+- **Track identity** — `urn:track:site-a:9421` identifies the track. Every update for this track uses the same `entity_id`.
+- **Source** — `urn:source:omnitrack-01` identifies the Trackgen source. The record was received at `site-a`.
+- **Source event** — `site-a:9421:118734` identifies this specific update from the source.
+- **Provenance** — `derived_from` points to the raw ASTERIX message and radar detection that helped create the fused track.
+- **Producer** — `producer_org` identifies DND as the organization that produced the record.
+- **Revision** — `revision_of` is `null` because a new track position is a new observation, not a correction to the previous one.
+- **Security** — the record uses the CAN security policy and is marked UNCLASSIFIED.
+
+An important distinction is:
+
+> The UME `id` identifies one specific track observation, while `entity_id` identifies the track itself.
+
+This means a moving track can have many UME records over time, all sharing the same `entity_id`.
 
 ### 11.2 FMV video segment
 
-`video.segment/examples/uav-eo-segment.json` is 10 seconds from a UAV EO camera: one record describing several files.
+`video.segment/examples/uav-eo-segment.json` represents a 10-second segment from a UAV EO camera.
 
-- **Time** is a span (17:45:10–17:45:20), with `datetime` set to the start (T2).
-- **Geometry** is the ground area the camera saw, from KLV, as a 3D polygon with the terrain height at each corner (71.5–74 m). The aircraft's own position is in the payload (`sensor_position`).
-- **Provenance:** primary data, so `derived_from` is empty. An EO detection found in this video would be a `sensor.detection` listing this segment in its `derived_from`.
-- **Links:** a `service` link to the sensor's live stream, by URN, resolved by the access layer. `next` / `previous` aren't stored (L2).
+The UME record describes the video segment, while the actual files are referenced through `assets`.
 
-| Asset | File | Media type | Role |
-|---|---|---|---|
-| `data` | Original segment with KLV (STANAG 4609), with size and checksum | `video/mp2t` | data |
-| `hls` | Playback rendition | `application/vnd.apple.mpegurl` | alternate |
-| `thumbnail` | Preview image | `image/jpeg` | thumbnail |
-| `klv` | Decoded KLV as JSON | `application/json` | metadata |
+- **Time** — `start_datetime` and `end_datetime` define when the video segment was recorded.
+- **Geometry** — the geometry represents the area on the ground visible in the video.
+- **Sensor position** — the UAV or camera position is kept separately in the payload.
+- **Provenance** — because this is source data, `derived_from` is empty.
+- **Derived data** — if a detection is later produced from the video, that `sensor.detection` record can point back to this video segment using `derived_from`.
+- **Links** — a `service` link can identify the live video stream. `next` and `previous` do not need to be stored because they can be generated when the data is queried.
 
-All `href` values are `s3://` references; GSS turns them into presigned or proxied URLs after the access check (L1).
+The related files are stored as assets:
 
-The **orthomosaic** (`imagery.ortho/examples/sector-b-orthomosaic.json`) follows the same pattern, with STAC field names in its payload so it exports as a STAC Item without translation.
+| Asset | What it contains | Media type |
+|---|---|---|
+| `data` | Original video segment with KLV | `video/mp2t` |
+| `hls` | Playback version | `application/vnd.apple.mpegurl` |
+| `thumbnail` | Preview image | `image/jpeg` |
+| `klv` | Decoded KLV metadata | `application/json` |
 
-### 11.3 UTM: volume, state and non-conformance
+The asset `href` values can use storage references such as:
 
-`utm.volume/examples/bvlos-nominal-volume.json` shows one 4D volume for a UTM operational intent. In this example, it represents a BVLOS flight west of Ottawa from 18:00 to 18:25, between 45 m and 165 m.
+```text
+s3://mission-lake/video/segment-001.ts
+```
 
-| UTM concept | How it is represented |
+GSS can turn these into a URL that the client can use after the access check succeeds.
+
+The orthomosaic example under `imagery.ortho` follows the same idea: the UME describes the imagery, while the actual image files are stored as assets.
+
+### 11.3 UTM volume, state and non-conformance
+
+`utm.volume/examples/bvlos-nominal-volume.json` shows how UME could represent a UTM flight volume.
+
+In this example, the volume represents a BVLOS operation west of Ottawa from 18:00 to 18:25, between 45 m and 165 m.
+
+| Concept | How it is represented |
 |---|---|
-| Flight volume | The 2D footprint is stored in `geometry`, while `place` describes the full 3D prism from 45 m to 165 m. `geometry_source: defined` means the footprint was provided directly. |
-| Time period | `start_datetime` and `end_datetime` define when the volume is active. |
-| Altitude limits | The prism uses `lower: 45` and `upper: 165`. The original altitude values are also kept in the payload. |
-| Operational intent | All records for the same intent use the same `entity_id`: `urn:uuid:<operational_intent_id>`. |
-| Normal and off-nominal volumes | `volume_type` identifies the volume as `nominal` or `off_nominal`. |
-| Updated intent | If the USS sends a new version of the volume, new records are created and `revision_of` points to the previous version. |
-| Intent state | Changes such as Accepted, Activated, Nonconforming, Contingent, and Ended are stored as `utm.intent_state` records. These are state changes, not revisions of the volume. |
-| Conformance monitoring | Fused tracks are compared against the active nominal volume. If a track leaves the allowed volume, an `alert.nonconformance` record is created. |
+| Flight area | `geometry` contains the 2D footprint. |
+| 3D volume | `place` contains the full Prism, including the lower and upper height limits. |
+| Active time | `start_datetime` and `end_datetime` define when the volume applies. |
+| Operational intent | All records for the same intent share the same `entity_id`. |
+| Volume type | `volume_type` identifies the volume as `nominal` or `off_nominal`. |
+| Updated volume | A new record is created. `revision_of` can point to the previous version. |
+| Intent state | State changes such as Accepted or Activated are stored as separate `utm.intent_state` records. |
+| Non-conformance | If a track leaves its allowed volume, an `alert.nonconformance` record is created. |
 
-**State change:**  
-`utm.intent_state/examples/intent-activated.json` shows the intent changing from Accepted to Activated at 18:00. It does not need geometry because the intent's volume records already describe where the flight is allowed to operate. The event ID, such as `<intent>:v1:Activated`, also makes it possible to recognise the same state change if it is received more than once.
+#### Intent state change
 
-**Non-conformance:**  
-`alert.nonconformance/examples/bvlos-volume-exit.json` shows track `site-a:9512` leaving its allowed volume at an altitude of 85 m. The alert references both the track and the UTM volume using `derived_from`. Its `releasable_to` value is based on what both source records are allowed to share.
+`utm.intent_state/examples/intent-activated.json` shows the intent changing from Accepted to Activated at 18:00.
+
+The record does not need its own geometry because the related `utm.volume` already defines where the operation takes place.
+
+A source event ID such as:
+
+```text
+<intent>:v1:Activated
+```
+
+can help identify duplicate messages if the same state change is received more than once.
+
+#### Non-conformance
+
+`alert.nonconformance/examples/bvlos-volume-exit.json` shows track `site-a:9512` leaving its allowed flight volume.
+
+The alert points back to both:
+
+- the track that left the volume
+- the UTM volume that defined where the aircraft was allowed to operate
+
+Both are referenced through `derived_from`.
+
+This keeps three different concepts separate:
+
+```text
+utm.volume
+    │
+    ├── defines where and when the flight may operate
+    │
+    ├── utm.intent_state records changes to the intent
+    │
+    └── alert.nonconformance records a detected problem
+```
 
 ### 11.4 NOTAM
 
-`aim.notam/examples/ottawa-restricted-area.json` shows a temporary restricted area around downtown Ottawa. The area is a 2 NM radius, from the surface up to 1,500 ft AMSL, active from 17:00 to 21:00. RPAS operations are prohibited while the NOTAM is active.
+`aim.notam/examples/ottawa-restricted-area.json` shows how UME could represent a temporary restricted area.
 
-| NOTAM concept | How it is represented |
+In this example, the NOTAM:
+
+- applies from 17:00 to 21:00
+- covers a 2 NM radius
+- extends from the surface to 1,500 ft AMSL
+- prohibits RPAS operations while active
+
+| Concept | How it is represented |
 |---|---|
-| Start and end time | `start_datetime` and `end_datetime` define when the NOTAM is active. |
-| Schedule | Any additional operating schedule is stored in the payload `schedule`. |
-| Restricted area | The circular area is converted into a 24-sided polygon for the footprint and Prism base. The original centre point and radius are also kept in the payload. |
-| Altitude limits | The Prism represents the vertical limits. The lower limit is the surface, so no `lower` value is needed. The upper limit is stored as 423 m after conversion from 1,500 ft AMSL. The original value is also kept in the payload. |
-| NOTAM details | Information such as the NOTAM ID, Q-code, FIR, location, and text is stored in the payload. The example uses `A1234/26`, `QRTCA`, `CZUL`, and `CYOW`. |
-| NOTAM identity | `entity_id` identifies the NOTAM, for example `urn:notam:A1234/26`. |
-| Replaced or cancelled NOTAM | A replacement or cancellation is stored as a new record using `revision_of` to reference the earlier NOTAM. A replacement NOTAM can also use `replaces`. |
-| Original NOTAM files | The original AIXM 5.1 Digital NOTAM and ICAO-format text can be stored as related assets. |
+| Active time | `start_datetime` and `end_datetime` |
+| Schedule | Additional schedule information stays in the payload |
+| Area | `geometry` contains the area used for spatial searches |
+| Height limits | `place` contains the vertical limits |
+| NOTAM details | ID, Q-code, FIR, location, and text stay in the payload |
+| NOTAM identity | `entity_id` identifies the NOTAM |
+| Replacement | A new record can use `revision_of` to point to the previous NOTAM |
+| Original files | AIXM and ICAO-format text can be stored as assets |
+
+The example keeps both:
+
+- a normalized UME representation that the Data Fabric can search
+- the original NOTAM information for systems that need the aviation-specific details
+
+This allows common platform services to work with the NOTAM without losing the original source information.
 
 ### 11.5 Zone, alert, acknowledgement and command
 
 This Counter-UAS example shows how several UME records can work together to describe a site-protection event.
 
-| Record | What it represents | Entity | Links |
-|---|---|---|---|
-| `zone.geofence`: Substation B protection zone | A protected area around the substation. It is active from 2026-01-01 with no end date, from the surface up to 150 m AGL. A breach of this zone is marked as `SEVERE`. | `urn:zone:northgrid:substation-b` | — |
-| `alert.zone_breach`: UAS entered the zone at 18:05:12 | An alert showing where the UAS entered the protected area, at 95 m. The alert is marked `SEVERE`, `IMMEDIATE`, and `OBSERVED`. It identifies both the track and the zone involved. | The alert itself | `derived_from` the track and zone records |
-| `alert.state_change`: alert acknowledged at 18:05:30 | Records that an operator acknowledged the alert, changing it from `ACTIVE` to `ACKNOWLEDGED`. It can also include the operator and a note. | The alert | — |
-| `track.command`: operator reclassified the UAS at 18:05:40 | Records an operator command that changes the track classification to `SUSPECT`, identifies it as a UAS, adds the tag `intrusion`, and records the reason. | `urn:track:site-a:9507` | `derived_from` the alert |
+| Record | What it represents |
+|---|---|
+| `zone.geofence` | Defines the protected area around Substation B. |
+| `alert.zone_breach` | Records that a UAS entered the protected area. |
+| `alert.state_change` | Records that an operator acknowledged or changed the state of the alert. |
+| `track.command` | Records an operator action against the track, such as reclassifying it. |
 
-`sensor.status/examples/rid-receiver-operational.json` adds the sensor status to the same site picture. It shows the Remote ID receiver's 5 km coverage area, its current operating state, and its `entity_id`. This allows the latest-state view to keep the most recent status for each sensor.
+The records can be linked like this:
+
+```text
+zone.geofence
+      │
+      │       track.fused
+      │           │
+      └───────────┴────► alert.zone_breach
+                              │
+                              ├──► alert.state_change
+                              │       acknowledged
+                              │
+                              └──► track.command
+                                      reclassify
+```
+
+Each record has a different purpose:
+
+- the **zone** defines the protected area
+- the **track** identifies the UAS
+- the **alert** records that a breach occurred
+- the **state change** records what happened to the alert
+- the **command** records what the operator did
+
+This keeps the history clear because each event is stored as its own record instead of repeatedly changing one record.
+
+`sensor.status/examples/rid-receiver-operational.json` adds the Remote ID receiver to the same site picture.
+
+The status record can contain:
+
+- the sensor's operating state
+- its coverage area
+- its `entity_id`
+
+All status updates for the same sensor use the same `entity_id`. This allows the platform to show the latest sensor status while still keeping the previous status records.
 
 ## 12. Vertical model
 
@@ -1155,3 +1270,33 @@ In this example, the volume covers the same 2D area from **45 m to 165 m**.
 - **Volumes have clear lower and upper limits.** JSON-FG Prism represents a 2D area between two heights, which matches the way UTM volumes, NOTAMs, and geofences are commonly described.
 - **Standard GeoJSON clients still work.** Clients that do not understand JSON-FG can continue using the normal `geometry` member. For a volume, they see the 2D footprint and can ignore `place`.
 - **3D-aware clients get the full model.** Clients that support JSON-FG can use the Prism in `place` to understand the complete 3D volume.
+
+## 13. Standards references
+
+The following standards and specifications are referenced in this review. These links are provided as a convenient starting point for further reading.
+
+| Standard / specification | Used for | Reference |
+|---|---|---|
+| **GeoJSON – RFC 7946** | Basic `Feature`, geometry, and coordinate structure | [RFC 7946 – GeoJSON](https://www.rfc-editor.org/info/rfc7946/?utm_source=chatgpt.com) |
+| **OGC Features and Geometries JSON (JSON-FG) 1.0** | Extends GeoJSON with features such as `place`, Prism geometry, time, and additional CRS support | [OGC JSON-FG 1.0](https://www.ogc.org/standards/json-fg/?utm_source=chatgpt.com) |
+| **OGC Simple Feature Access** | Defines common geometry concepts such as Point, LineString, Polygon, and geometry collections | [OGC Simple Feature Access](https://www.ogc.org/standards/sfa/?utm_source=chatgpt.com) |
+| **OGC API – Features** | API patterns for querying and returning geospatial features; also defines use of CRS84 and CRS84h | [OGC API – Features](https://www.ogc.org/standards/ogcapi-features/?utm_source=chatgpt.com) |
+| **RFC 3339** | Date and time format used by UME timestamps | [RFC 3339 – Date and Time on the Internet](https://www.rfc-editor.org/info/rfc3339/?utm_source=chatgpt.com) |
+| **RFC 8141** | URN syntax used for stable identifiers such as `urn:source:...` and `urn:org:...` | [RFC 8141 – Uniform Resource Names](https://www.rfc-editor.org/info/rfc8141/?utm_source=chatgpt.com) |
+| **RFC 9562** | UUIDs, including UUIDv7 used for UME record IDs | [RFC 9562 – UUIDs](https://www.rfc-editor.org/info/rfc9562/?utm_source=chatgpt.com) |
+| **ISO 3166-1** | Standard country codes such as `CAN`, `USA`, `GBR`, `AUS`, and `NZL` | [ISO 3166-1 Country Codes](https://www.iso.org/standard/72482.html?utm_source=chatgpt.com) |
+| **IANA Link Relations** | Standard values for link relationships such as `self`, `related`, `alternate`, `next`, and `prev` | [IANA Link Relations Registry](https://www.iana.org/assignments/link-relations?utm_source=chatgpt.com) |
+| **IANA Media Types** | Standard media types used by links and assets, such as `image/jpeg` and `video/mp2t` | [IANA Media Types Registry](https://www.iana.org/assignments/media-types?utm_source=chatgpt.com) |
+| **STAC** | Asset, link, imagery, and spatiotemporal metadata patterns | [STAC Specification](https://github.com/radiantearth/stac-spec?utm_source=chatgpt.com) |
+| **STAC File Info Extension** | Fields such as `file:size` and `file:checksum` | [STAC File Info Extension](https://github.com/stac-extensions/file?utm_source=chatgpt.com) |
+| **FIPS 180-4 – Secure Hash Standard** | SHA-256 checksums used for file and configuration integrity | [NIST FIPS 180-4](https://csrc.nist.gov/pubs/fips/180-4/upd1/final?utm_source=chatgpt.com) |
+| **W3C PROV** | Standard model for exchanging provenance and lineage information | [W3C PROV Overview](https://www.w3.org/TR/prov-overview/?utm_source=chatgpt.com) |
+| **CloudEvents** | Optional standard event metadata for messages sent over NATS, Kafka, MQTT, or other transports | [CloudEvents Specification](https://github.com/cloudevents/spec?utm_source=chatgpt.com) |
+| **Government of Canada Policy on Government Security** | Canadian security and classification policy referenced by the `CAN` security policy | [Policy on Government Security](https://www.tbs-sct.canada.ca/pol/doc-eng.aspx?id=16578&utm_source=chatgpt.com) |
+| **STANAG 4774** | NATO confidentiality metadata labelling | [NATO Standardization Agreements](https://www.nato.int/cps/en/natohq/stanag.htm?utm_source=chatgpt.com) |
+| **STANAG 4778** | Binding security labels to the data they protect | [NATO Standardization Agreements](https://www.nato.int/cps/en/natohq/stanag.htm?utm_source=chatgpt.com) |
+| **STANAG 4609** | Full-motion video and associated metadata | [NATO Standardization Agreements](https://www.nato.int/cps/en/natohq/stanag.htm?utm_source=chatgpt.com) |
+
+Some NATO standards are not available as unrestricted public documents. The NATO Standardization Office catalogue should be used to find the applicable edition and determine whether access is available.
+
+These references are included for convenience. The applicable version and profile should still be confirmed when a standard is formally adopted by the Data Fabric.
