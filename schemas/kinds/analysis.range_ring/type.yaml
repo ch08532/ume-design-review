@@ -1,20 +1,19 @@
-# Type definition for analysis.measurement.
+# Type definition for analysis.range_ring.
 # envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | not_allowed
 # z: heights in geometry positions; vertical_extent: lower/upper height limits on a 2D Polygon/MultiPolygon geometry (a volume).
 # entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
-kind: analysis.measurement
-schema: urn:schema:analysis:measurement:v1
+kind: analysis.range_ring
+schema: urn:schema:analysis:range-ring:v1
 status: draft
 envelope:
   time: instant
   geometry: required
   geometry_source:
   - defined
-  z: optional
+  z: not_allowed
   vertical_extent: not_allowed
   entity_id: required
-  entity_id_template: urn:uuid:{payload.measurement_id}
+  entity_id_template: urn:uuid:{payload.range_ring_id}
   required_assets: []
-source_event_id: measurement_id:source_at timestamp of the edit
-index_hints:
-- payload->>'measurement_type'
+source_event_id: range_ring_id:source_at timestamp of the edit
+index_hints: []

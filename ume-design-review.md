@@ -1040,6 +1040,7 @@ These are only example `kind` values, created to show how UME could work with di
 | `zone.geofence` | A protected, restricted, or monitored area | Time period, optionally no end time | Zone area (Polygon / MultiPolygon) | Lower and upper limits | Zone | — |
 | `sensor.status` | Sensor health, status, and coverage | Single point in time | Sensor coverage area (Polygon) | Optional | Sensor | — |
 | `analysis.measurement` | A distance or path measured with a map measurement tool | Single point in time | Measured line (LineString) | Optional | Measurement | — |
+| `analysis.range_ring` | Concentric range rings drawn with a map analysis tool | Single point in time | Ring centre (Point) | — | Range rings | — |
 
 ---
 
@@ -1064,7 +1065,8 @@ sensor.detection ─┘
 
 zone.geofence ─► alert.zone_breach ─► alert.state_change
                         ├────────────► track.command
-                        └────────────► analysis.measurement
+                        ├────────────► analysis.measurement
+                        └────────────► analysis.range_ring
 
 utm.volume ─┬─► alert.nonconformance
             └── utm.intent_state
@@ -1234,8 +1236,11 @@ zone.geofence
                               ├──► track.command
                               │       reclassify
                               │
-                              └──► analysis.measurement
-                                      gate-to-UAS distance
+                              ├──► analysis.measurement
+                              │       gate-to-UAS distance
+                              │
+                              └──► analysis.range_ring
+                                      standoff rings
 ```
 
 Each record has a different purpose:
@@ -1267,8 +1272,22 @@ All status updates for the same sensor use the same `entity_id`. This allows the
 | Measured line | `geometry` is a LineString through the measured points. It can be 3D if heights were measured. |
 | Results | The total length (457.9 m), the length of each segment, and the initial bearing stay in the payload, along with `method` (`GEODESIC`, `RHUMB_LINE` or `SLANT_3D`). |
 | Who and where | `source.id` is the operator console that generated the record, and `provenance.creator` is the operator who made the measurement. |
-| Related records | `derived_from` points to the zone-breach alert the operator was working from. `payload.references` lists the track and zone that were measured. |
+| Related records | `derived_from` points to the zone-breach alert the operator was working from. |
 | Edits | Each edit is a new record with the same `entity_id` and a `revision_of` pointing to the previous version. |
+
+### 11.7 Range rings
+
+`analysis.range_ring/examples/substation-standoff-rings.json` is another analysis-tool record from the same event. The operator places three rings, 500 m apart, around the centre of Substation B.
+
+| Concept | How it is represented |
+|---|---|
+| Centre | `geometry` is a Point at the centre of the rings. |
+| Rings | Only `ring_count` and `ring_spacing_m` are stored. Ring *k* has a radius of *k* × `ring_spacing_m`, so these rings are at 500, 1,000 and 1,500 m. The circles themselves are never stored, and clients compute and draw them. |
+| Who and where | The same as for a measurement: `source.id` is the console and `provenance.creator` is the operator. |
+| Related records | `derived_from` points to the zone-breach alert. |
+| Edits | Each edit is a new record with `revision_of`, as for a measurement. |
+
+Storing the parameters instead of computed circles keeps the record small and exact. A spatial search finds the rings by their centre. To ask "which rings cover this location?", compare the distance to the centre with `ring_count` × `ring_spacing_m`.
 
 ## 12. Vertical model
 

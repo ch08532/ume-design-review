@@ -6,7 +6,6 @@
   "type": "object",
   "required": [
     "measurement_id",
-    "edit_sequence",
     "measurement_type",
     "method",
     "total_length_m"
@@ -15,11 +14,6 @@
   "properties": {
     "measurement_id": {
       "$ref": "urn:schema:fabric:common:v1#/$defs/uuid"
-    },
-    "edit_sequence": {
-      "type": "integer",
-      "minimum": 1,
-      "description": "Increments each time the operator edits the measurement"
     },
     "measurement_type": {
       "enum": [
@@ -54,14 +48,6 @@
     },
     "label": {
       "type": "string"
-    },
-    "references": {
-      "type": "array",
-      "items": {
-        "$ref": "urn:schema:fabric:common:v1#/$defs/entity_urn"
-      },
-      "uniqueItems": true,
-      "description": "Entities the measurement was taken to or from, e.g. a track or zone"
     }
   }
 }

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:schema:analysis:range-ring:v1",
+  "title": "Payload: range rings v1",
+  "description": "Concentric range rings drawn with a map analysis tool. The envelope geometry is the centre Point; the rings are not stored, they are computed from ring_count and ring_spacing_m (ring k has radius k * ring_spacing_m, measured geodesically). Edits are new records with revision_of.",
+  "type": "object",
+  "required": [
+    "range_ring_id",
+    "ring_count",
+    "ring_spacing_m"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "range_ring_id": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/uuid"
+    },
+    "ring_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "ring_spacing_m": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Distance between rings; also the radius of the first ring"
+    },
+    "label": {
+      "type": "string"
+    }
+  }
+}

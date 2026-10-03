@@ -1,37 +1,27 @@
 {
-  "id": "urn:uuid:01926f46-1a30-7c45-8d56-6e7f8091a2b3",
+  "id": "urn:uuid:01926f46-4b10-7d21-8e32-9f40a1b2c3d4",
   "geometry": {
-    "type": "LineString",
+    "type": "Point",
     "coordinates": [
-      [
-        -75.7012,
-        45.3908
-      ],
-      [
-        -75.7031,
-        45.3921
-      ],
-      [
-        -75.7052,
-        45.3938
-      ]
+      -75.705,
+      45.39375
     ]
   },
   "coordRefSys": "http://www.opengis.net/def/crs/OGC/0/CRS84h",
   "properties": {
     "ume_version": "1",
-    "kind": "analysis.measurement",
-    "schema": "urn:schema:analysis:measurement:v1",
-    "entity_id": "urn:uuid:7b3e9a1c-4d2f-4e8a-9b6c-1f2e3d4c5b6a",
-    "datetime": "2026-09-23T18:06:10.000Z",
+    "kind": "analysis.range_ring",
+    "schema": "urn:schema:analysis:range-ring:v1",
+    "entity_id": "urn:uuid:2c4d6e8f-1a3b-4c5d-8e7f-9a0b1c2d3e4f",
+    "datetime": "2026-09-23T18:07:00.000Z",
     "start_datetime": null,
     "end_datetime": null,
     "time_source": "event",
     "times": {
-      "source_at": "2026-09-23T18:06:10.000Z",
-      "sent_at": "2026-09-23T18:06:10.015Z",
-      "received_at": "2026-09-23T18:06:10.030Z",
-      "stored_at": "2026-09-23T18:06:10.041Z"
+      "source_at": "2026-09-23T18:07:00.000Z",
+      "sent_at": "2026-09-23T18:07:00.014Z",
+      "received_at": "2026-09-23T18:07:00.029Z",
+      "stored_at": "2026-09-23T18:07:00.040Z"
     },
     "expires_at": null,
     "geometry_source": "defined",
@@ -40,7 +30,7 @@
     "source": {
       "id": "urn:source:console-03",
       "node": "site-a",
-      "event_id": "7b3e9a1c-4d2f-4e8a-9b6c-1f2e3d4c5b6a:2026-09-23T18:06:10.000Z"
+      "event_id": "2c4d6e8f-1a3b-4c5d-8e7f-9a0b1c2d3e4f:2026-09-23T18:07:00.000Z"
     },
     "provenance": {
       "origin": "urn:source:console-03",
@@ -48,7 +38,7 @@
         "urn:uuid:01926f45-5c12-7d34-9e56-0a1b2c3d4e5f"
       ],
       "revision_of": null,
-      "produced_by": "map-measure-tool",
+      "produced_by": "map-range-ring-tool",
       "producer_version": "2.3.1",
       "producer_org": "urn:org:northgrid-utility",
       "creator": "urn:user:northgrid:op-117",
@@ -67,16 +57,10 @@
       "originator": "urn:org:northgrid-utility"
     },
     "payload": {
-      "measurement_id": "7b3e9a1c-4d2f-4e8a-9b6c-1f2e3d4c5b6a",
-      "measurement_type": "PATH",
-      "method": "GEODESIC",
-      "total_length_m": 457.9,
-      "segment_lengths_m": [
-        207.4,
-        250.5
-      ],
-      "initial_bearing_deg": 314.2,
-      "label": "South gate to UAS position via access road"
+      "range_ring_id": "2c4d6e8f-1a3b-4c5d-8e7f-9a0b1c2d3e4f",
+      "ring_count": 3,
+      "ring_spacing_m": 500,
+      "label": "Substation B 500 m standoff rings"
     }
   },
   "links": [],
