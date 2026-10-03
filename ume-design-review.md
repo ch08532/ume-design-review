@@ -1021,24 +1021,24 @@ index_hints:
 
 ### 10.4 Kinds
 
-These are only example `kind` values, created to show how UME could work with different types of real-world payloads. They are not a fixed or complete list. The table also shows the basic characteristics of each example, including what it represents, whether it applies to a single point in time or a time period, what location or shape it uses, whether height is needed, what entity it belongs to, and whether it includes any related files.
+These are only example `kind` values, created to show how UME could work with different types of real-world payloads. They are not a fixed or complete list. The table also shows the basic characteristics of each example, including what it represents, whether it applies to a single point in time or a time period, what location or shape it uses, whether height is needed, what entity it belongs to, and whether it includes any related files. The geometry type in brackets is the one that is typical for that kind, as used in the examples. It is not enforced. Volume kinds can also use a MultiPolygon, for areas made of several separate parts.
 
 | Kind | What it represents | Time | Location / shape | Height | Linked entity | Files |
 |---|---|---|---|---|---|---|
-| `track.raw` | One raw message from a sensor | Single point in time | Sensor coverage area | — | — | Batch file |
-| `sensor.detection` | One detection from a sensor before tracks are combined | Single point in time | Estimated position | Optional | Optional | — |
-| `track.fused` | The latest state of a fused track | Single point in time | Track position | Optional | Track | — |
-| `track.command` | An operator action applied to a track | Single point in time | Optional | — | Target track, if needed | — |
-| `alert.zone_breach` | An alert when a track enters, leaves, or stays too long in a zone | Single point in time | Where the breach happened | Optional | Alert | — |
-| `alert.nonconformance` | An alert when a track leaves its planned UTM volume | Single point in time | Track position | Optional | Alert | — |
+| `track.raw` | One raw message from a sensor | Single point in time | Sensor coverage area (Polygon) | — | — | Batch file |
+| `sensor.detection` | One detection from a sensor before tracks are combined | Single point in time | Estimated position (Point) | Optional | Optional | — |
+| `track.fused` | The latest state of a fused track | Single point in time | Track position (Point) | Optional | Track | — |
+| `track.command` | An operator action applied to a track | Single point in time | Optional (Point) | — | Target track, if needed | — |
+| `alert.zone_breach` | An alert when a track enters, leaves, or stays too long in a zone | Single point in time | Where the breach happened (Point) | Optional | Alert | — |
+| `alert.nonconformance` | An alert when a track leaves its planned UTM volume | Single point in time | Track position (Point) | Optional | Alert | — |
 | `alert.state_change` | A change to an alert, such as acknowledged, escalated, resolved, or dismissed | Single point in time | None | — | Alert | — |
-| `video.segment` | A section of full-motion video | Time period | Area shown by the video | Optional | — | Video, HLS, thumbnail, KLV |
-| `imagery.ortho` | An orthorectified image | Time period | Image footprint | Optional | — | COG, thumbnail |
-| `utm.volume` | One 4D airspace volume for an operational intent | Time period | 2D footprint | Lower and upper limits | Operational intent | — |
+| `video.segment` | A section of full-motion video | Time period | Area shown by the video (Polygon) | Optional | — | Video, HLS, thumbnail, KLV |
+| `imagery.ortho` | An orthorectified image | Time period | Image footprint (Polygon) | Optional | — | COG, thumbnail |
+| `utm.volume` | One 4D airspace volume for an operational intent | Time period | 2D footprint (Polygon / MultiPolygon) | Lower and upper limits | Operational intent | — |
 | `utm.intent_state` | A change in the state of an operational intent | Single point in time | Optional | — | Operational intent | — |
-| `aim.notam` | A NOTAM that applies to an area | Time period | Restricted area | Lower and upper limits | NOTAM | AIXM, text |
-| `zone.geofence` | A protected, restricted, or monitored area | Time period, optionally no end time | Zone area | Lower and upper limits | Zone | — |
-| `sensor.status` | Sensor health, status, and coverage | Single point in time | Sensor coverage area | Optional | Sensor | — |
+| `aim.notam` | A NOTAM that applies to an area | Time period | Restricted area (Polygon / MultiPolygon) | Lower and upper limits | NOTAM | AIXM, text |
+| `zone.geofence` | A protected, restricted, or monitored area | Time period, optionally no end time | Zone area (Polygon / MultiPolygon) | Lower and upper limits | Zone | — |
+| `sensor.status` | Sensor health, status, and coverage | Single point in time | Sensor coverage area (Polygon) | Optional | Sensor | — |
 | `analysis.measurement` | A distance or path measured with a map measurement tool | Single point in time | Measured line (LineString) | Optional | Measurement | — |
 
 ---
