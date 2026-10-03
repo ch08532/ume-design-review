@@ -94,7 +94,7 @@ The envelope should only contain information that is useful across many differen
 | `entity_id` | Groups records that belong to the same real-world thing, such as a track, alert, sensor, or zone. | DP7 |
 | Time | Records when something happened or the time period when it applies. Supports ordering, time-based queries, and retention. | DP2 |
 | Geometry | Stores the location or shape when the record has a spatial component. Supports maps and spatial queries. | DP2 |
-| Height / volume | Adds vertical information where needed. Points and lines can use a height coordinate, while volumes can use a JSON-FG Prism in `place`. | DP2 |
+| Height / volume | Adds vertical information where needed. Points and lines can use a height coordinate, while volumes use a 2D polygon footprint with a `vertical_extent` (lower and upper height limits) on the geometry. | DP2 |
 | Source, node, and source event ID | Identify where the data came from and help with routing, synchronization, trust, and duplicate detection. | DP3, DP5, DP8 |
 | Provenance | Records what the data was derived from and which service or process created it. | DP7 |
 | Security label | Provides the information needed to make access and sharing decisions. | DP8 |
@@ -145,9 +145,9 @@ The following are the main issues I found in the current UME design. None of the
 | **PF1** | Track-specific fields such as `spatial.track` are part of the common UME structure, even though most other data types do not need them. | Move track-specific fields into the track payload. Tracks can still be a standard UME type, but they should not be built into the common envelope. |
 | **PF2** | Raw binary track data can be stored as base64 inside the UME record. This makes the record larger and can create a lot of extra data at normal sensor update rates. | Avoid storing raw binary directly in UME records where possible. Send it on the messaging backbone or store it separately as a file or short-retention raw-data record when it needs to be kept. |
 | **PF3** | The current time fields do not clearly separate when the real-world event happened from when the data was sent, received, or stored. There is also no common way to show a start and end time. | Add `datetime` for when an event happened and `start_datetime` / `end_datetime` for things that last over a period of time. Keep the processing timestamps together in a separate `times` section. |
-| **PF4** | Height can be interpreted differently depending on the CRS and `altitude_type`. This makes it harder for clients to know exactly what the third coordinate means. | Use one consistent height model for UME geometry. Store 3D positions as longitude, latitude, and WGS-84 ellipsoidal height. Keep source values such as pressure altitude in the payload. Use JSON-FG Prism for volumes with lower and upper height limits. |
+| **PF4** | Height can be interpreted differently depending on the CRS and `altitude_type`. This makes it harder for clients to know exactly what the third coordinate means. | Use one consistent height model for UME geometry. Store 3D positions as longitude, latitude, and WGS-84 ellipsoidal height. Keep source values such as pressure altitude in the payload. Represent volumes as a 2D polygon footprint whose geometry carries a `vertical_extent` with lower and upper height limits. State the CRS on every record in `coordRefSys`. |
 | **PF5** | The `index` field is a single increasing number across UME records. This requires coordination between nodes and can be difficult when sites are disconnected. | Remove the global counter and use globally unique record IDs such as UUIDv7. Use a separate source event ID to detect duplicate source messages. |
-| **PF6** | The current UME JSON structure is close to OGC JSON-FG / GeoJSON, but still uses its own custom structure. This means OGC-based clients may need extra translation. | Align the UME JSON structure more closely with OGC JSON-FG / GeoJSON using fields such as `type`, `id`, `geometry`, `properties`, and `place` where needed. |
+| **PF6** | The current UME JSON structure is close to GeoJSON, but still uses its own custom structure. This makes geometry handling and conversion less straightforward than it needs to be. | Follow GeoJSON practice without requiring the UME to be GeoJSON: use an `id` / `geometry` / `properties` layout, standard GeoJSON geometry objects, and an explicit `coordRefSys`. The UME is internal storage. Downstream services convert records to GeoJSON (or OGC JSON-FG, for example a Prism for volumes) for visualization. |
 
 ---
 
@@ -193,14 +193,14 @@ The current UME design already supports GeoJSON geometry and different coordinat
 
 | ID | Finding | Suggested change |
 |---|---|---|
-| **S1** | Height can be interpreted differently depending on the CRS and `altitude_type`. A client may need to check several fields before it knows what the third coordinate means. | Use one consistent vertical model. Store 3D positions as longitude, latitude, and WGS-84 ellipsoidal height. Keep source-specific values such as pressure altitude in the payload. Use JSON-FG Prism for volumes with lower and upper height limits. |
+| **S1** | Height can be interpreted differently depending on the CRS and `altitude_type`. A client may need to check several fields before it knows what the third coordinate means. | Use one consistent vertical model. Store 3D positions as longitude, latitude, and WGS-84 ellipsoidal height. Keep source-specific values such as pressure altitude in the payload. Represent volumes as a 2D polygon footprint whose geometry carries a `vertical_extent` with lower and upper height limits. |
 | **S2** | The design allows `spatial` to be `null`, but it does not clearly define which data types require geometry and which do not. | Define the geometry rules for each `kind`: `required`, `optional`, or `forbidden`. This avoids adding made-up locations to records that do not have a meaningful position. |
 | **S3** | Raw sensor data may not yet contain a known target position. Using a target point before the message is parsed could make spatial queries misleading. | If the target position is unknown, use the sensor location or sensor coverage area when useful, and clearly identify where the geometry came from with `geometry_source`. |
 | **S4** | `confidence` is a value from `0.0` to `1.0`, but the design does not define exactly what that number means. | Use a clearly defined field such as `position_error_m` for position accuracy. If other confidence values are needed, keep them in the payload and define their meaning in the payload schema. |
 | **S5** | `domain` mixes physical operating areas such as `AIR`, `LAND`, and `SPACE` with categories such as `CYBER`, `ENVIRONMENTAL`, and `LOGISTICS`. | Decide what `domain` is intended to represent and keep the list consistent. If it represents physical operating domains, keep other categories in the payload or another field. |
 | **S6** | Fields such as `horizontal_speed`, `vertical_speed`, and `bearing` do not clearly state their units or reference. | Include units and meaning in the field names, for example `ground_speed_mps`, `vertical_rate_mps`, `course_deg`, or `heading_deg`. |
 | **S7** | `track_id` is an integer, but the design does not define whether it must be unique across all nodes or only within one source or site. | Namespace track IDs so they remain unique when data from different nodes is combined, for example `site-a:9421`. |
-| **S8** | GeoJSON Polygon can describe an area or surface, but it does not directly describe an airspace volume with both a lower and upper height. | Use JSON-FG Prism for volumetric data such as UTM volumes, NOTAMs, and geofences. Keep the normal GeoJSON `geometry` as the 2D footprint for clients that do not support JSON-FG. |
+| **S8** | GeoJSON Polygon can describe an area or surface, but it does not directly describe an airspace volume with both a lower and upper height. | For volumetric data such as UTM volumes, NOTAMs, and geofences, store the 2D footprint once as the `geometry` polygon and add the height limits to it as `vertical_extent` (`lower`, `upper`). This keeps one shape per record, with its heights attached. A JSON-FG Prism can be derived from these at the API edge if a client needs one. |
 
 For geometry, I would also add a small `geometry_source` field so clients know where the location came from.
 
@@ -682,7 +682,6 @@ This example shows how a fused track from a sensor, such as ADS-B, could be repr
 
 ```json
 {
-  "type": "Feature",
   "id": "urn:uuid:01926f3a-8e10-7c32-b7e1-8890cf2b6941",
   "geometry": {
     "type": "Point",
@@ -692,7 +691,7 @@ This example shows how a fused track from a sensor, such as ADS-B, could be repr
       3200.5
     ]
   },
-  "place": null,
+  "coordRefSys": "http://www.opengis.net/def/crs/OGC/0/CRS84h",
   "properties": {
     "ume_version": "1",
     "kind": "track.fused",
@@ -782,8 +781,8 @@ The table below shows how fields in the current UME design would map to the prop
 | `temporal.valid_until` | `end_datetime` when it means the data stops being valid; `expires_at` only when it is a per-record retention override (T5). |
 | `temporal.index` / `spatial.track.index` | Removed. These are no longer needed in the record. |
 | `spatial.geometry` | Moves to the top-level `geometry` field. It can be 2D or 3D, or `null` when the `kind` allows it. |
-| Geometry height / `altitude_type` | Height is stored as the third geometry coordinate for points and lines. Volumes use a Prism in `place`. Original altitude values can still be kept in the payload. |
-| `spatial.crs` | Uses a fixed CRS: OGC CRS84h, meaning longitude, latitude, and WGS-84 ellipsoidal height. |
+| Geometry height / `altitude_type` | Height is stored as the third geometry coordinate for points and lines. Volumes use a 2D polygon footprint with a `vertical_extent` on the geometry. Original altitude values can still be kept in the payload. |
+| `spatial.crs` | Replaced by the required `coordRefSys` field. Currently the only allowed value is OGC CRS84h, meaning longitude, latitude, and WGS-84 ellipsoidal height. |
 | `spatial.confidence` | Replaced by `position_error_m` and `geometry_source`. |
 | `spatial.domain` | Becomes `domain`, used only for physical domains such as `AIR`, `LAND`, `SEA_SURFACE`, `SUBSURFACE`, or `SPACE`. |
 | `spatial.track.*` | Track-specific fields move into `payload`, based on the schema for that `kind`. |
@@ -821,10 +820,11 @@ Most of the basic UME envelope uses existing standards for geometry, time, ident
 
 | Field | Example / format | Status | Based on |
 |---|---|---|---|
-| `type` | `Feature` | ✅ | GeoJSON |
+| Record layout | `id`, `geometry`, `properties` | ◐ | Modelled on a GeoJSON Feature, but a UME record is not a GeoJSON Feature (no `type` member) |
 | Geometry | Point, LineString, Polygon, MultiPolygon, etc. | ✅ | GeoJSON / OGC |
 | Coordinates | longitude, latitude, optional height | ✅ | GeoJSON / OGC |
-| `place` | 3D Prism with a footprint, lower height, and upper height | ✅ | OGC JSON-FG |
+| `coordRefSys` | `http://www.opengis.net/def/crs/OGC/0/CRS84h` | ✅ | OGC CRS URI (as used by JSON-FG / OGC API – Features) |
+| `geometry.vertical_extent` | `{ "lower": 45.0, "upper": 165.0 }` on a Polygon / MultiPolygon (metres, in the `coordRefSys` vertical reference) | ◐ | Same lower/upper model as a JSON-FG Prism, without repeating the footprint |
 | `vertical_approximate` | `true` / `false` | ✖ | UME |
 | `id` | `urn:uuid:<UUIDv7>` | ✅ | UUID / URN standards |
 | Date and time | `2026-09-23T17:46:01.200Z` | ✅ | RFC 3339 |
@@ -878,6 +878,21 @@ UME should also use standard link names, media types, and file metadata where po
 The goal is not to make every field come from an external standard.
 
 Fields such as `kind`, `time_source`, and `geometry_source` are specific to UME and that is fine. The important thing is to use existing standards where they fit and clearly document the fields that UME defines itself.
+
+### 9.4 Identifier conventions
+
+UME identifiers are URNs (RFC 8141) of the form `urn:<type>:<id>`. The URNs in this review and in the example records, such as `urn:track:site-a:9421` or `urn:zone:northgrid:substation-b`, are **illustrative**. They show the pattern, not a fixed or registered set.
+
+The platform should define and publish the actual namespaces. Each identifier type should state:
+
+- **Structure:** its segments, for example `urn:schema:<domain>:<name>:v<N>`.
+- **Uniqueness scope:** what it must be unique within. Include enough in the ID to make it globally unique. For example, a NOTAM number is only unique per issuing office, so the ID should include the location indicator.
+- **Who assigns it:** the source, an adapter, or the platform.
+
+Two points to settle before v1:
+
+- **Namespace ownership.** Names such as `urn:track:` are not registered URN namespaces. That is fine internally, but they could clash if records are shared with partners. Placing all types under one controlled namespace, such as `urn:<org-ns>:track:...`, avoids this.
+- **Schema enforcement.** Each identifier type should have a matching pattern in the schemas. Today only `uuid`, `org`, `user` and `source` are checked strictly.
 
 ---
 
@@ -972,8 +987,8 @@ envelope:
   # Height may be included as the third coordinate: [lon, lat, height]
   z: optional                      # required | optional | forbidden
 
-  # Fused tracks do not use JSON-FG Prism geometry
-  place: forbidden                 # required | optional | forbidden
+  # Fused tracks are not volumes, so they have no vertical extent
+  vertical_extent: forbidden       # required | optional | forbidden
 
   # The record must identify the track it belongs to
   entity_id: required              # required | optional | forbidden
@@ -1110,7 +1125,7 @@ In this example, the volume represents a BVLOS operation west of Ottawa from 18:
 | Concept | How it is represented |
 |---|---|
 | Flight area | `geometry` contains the 2D footprint. |
-| 3D volume | `place` contains the full Prism, including the lower and upper height limits. |
+| 3D volume | The geometry's `vertical_extent` contains the lower and upper height limits. |
 | Active time | `start_datetime` and `end_datetime` define when the volume applies. |
 | Operational intent | All records for the same intent share the same `entity_id`. |
 | Volume type | `volume_type` identifies the volume as `nominal` or `off_nominal`. |
@@ -1171,7 +1186,7 @@ In this example, the NOTAM:
 | Active time | `start_datetime` and `end_datetime` |
 | Schedule | Additional schedule information stays in the payload |
 | Area | `geometry` contains the area used for spatial searches |
-| Height limits | `place` contains the vertical limits |
+| Height limits | The geometry's `vertical_extent` contains the vertical limits |
 | NOTAM details | ID, Q-code, FIR, location, and text stay in the payload |
 | NOTAM identity | `entity_id` identifies the NOTAM |
 | Replacement | A new record can use `revision_of` to point to the previous NOTAM |
@@ -1241,9 +1256,9 @@ For points, lines, and other position-based geometry, use the third GeoJSON coor
 
 `[longitude, latitude, height]`
 
-For volumes, use a **JSON-FG Prism** in the `place` member. The normal `geometry` member keeps the 2D footprint so standard GeoJSON clients can still use it.
+For volumes, use a 2D `Polygon` or `MultiPolygon` as the footprint, and add the lower and upper height limits to the same geometry object as a `vertical_extent` member. The footprint is stored once, and the shape and its heights stay together. A `GeometryCollection` can mix volumes with other shapes, because each member can carry its own `vertical_extent`.
 
-All heights are stored in metres above the WGS-84 ellipsoid, using OGC `CRS84h`.
+Every record states its coordinate reference system in the required `coordRefSys` field. It applies to all positions in `geometry` and to any `vertical_extent`. Currently the only allowed value is OGC `CRS84h`: longitude and latitude in WGS-84 degrees, with heights in metres above the WGS-84 ellipsoid. Because every record carries its CRS, more CRSs can be added later without making older records ambiguous.
 
 ### Point or track position
 
@@ -1266,36 +1281,42 @@ height    = 3200.5 m
 
 ### Airspace volume
 
-A volume needs both a lower and an upper height. A normal GeoJSON Polygon cannot represent this by itself, so the 2D footprint is stored in `geometry` and the full 3D volume is stored as a JSON-FG Prism in `place`.
+A volume needs both a lower and an upper height. A normal GeoJSON Polygon cannot represent this by itself, so the UME adds a `vertical_extent` member to the polygon.
 
 ```json
 "geometry": {
   "type": "Polygon",
-  "coordinates": [[ ...2D footprint... ]]
+  "coordinates": [[ ...2D footprint... ]],
+  "vertical_extent": { "lower": 45.0, "upper": 165.0 }
 },
-
-"place": {
-  "type": "Prism",
-  "base": {
-    "type": "Polygon",
-    "coordinates": [[ ...same footprint... ]]
-  },
-  "lower": 45.0,
-  "upper": 165.0
-},
-
 "coordRefSys": "http://www.opengis.net/def/crs/OGC/0/CRS84h"
 ```
 
-In this example, the volume covers the same 2D area from **45 m to 165 m**.
+In this example, the volume covers the footprint from **45 m to 165 m**. If either limit is omitted, the volume is unbounded in that direction. The validator checks that `lower <= upper` and that a shape with a `vertical_extent` has 2D coordinates.
+
+`vertical_extent` is not part of GeoJSON. This is acceptable because the UME follows GeoJSON practice but is not required to be GeoJSON. When a record is converted to GeoJSON for visualization, the converter drops the member or uses it to build a JSON-FG Prism.
+
+Volumes are not built from 3D coordinates. A polygon with heights on its corners describes a surface, not a solid, and GeoJSON has no solid type. Non-prismatic volumes, such as sloped approach surfaces, can be added later as a separate geometry type or a mesh asset if needed.
+
+### Heights relative to the ground (AGL)
+
+AGL is not a CRS, because it depends on the terrain at each point. Heights are therefore always converted before they are stored:
+
+- **Points:** z = terrain height above the ellipsoid (from a DEM and geoid model) + the AGL value.
+- **Volumes:** for a terrain-following limit such as "SFC to 400 ft AGL", `vertical_extent` holds a conservative box that contains the real volume: `lower` = minimum terrain under the footprint + the lower limit, and `upper` = maximum terrain + the upper limit.
+- **In both cases** the source value is kept in the payload (`altitude` with `reference: "AGL"` or `"SFC"`), and `vertical_approximate` is set to `true`. Exact terrain-following checks use the payload values and a DEM. The envelope is used for fast filtering.
+
+This keeps every z value comparable across records, so no query needs a terrain lookup.
 
 ### Why use this approach?
 
 - **Location and height stay together.** Points and tracks keep their height directly in the geometry instead of using a separate height field.
 - **Track positions are simple.** A position is represented as `[longitude, latitude, height]`, which is easy for mapping and 3D clients to work with.
-- **Volumes have clear lower and upper limits.** JSON-FG Prism represents a 2D area between two heights, which matches the way UTM volumes, NOTAMs, and geofences are commonly described.
-- **Standard GeoJSON clients still work.** Clients that do not understand JSON-FG can continue using the normal `geometry` member. For a volume, they see the 2D footprint and can ignore `place`.
-- **3D-aware clients get the full model.** Clients that support JSON-FG can use the Prism in `place` to understand the complete 3D volume.
+- **One shape, with its heights.** The footprint is stored once, and its height limits sit on the same geometry object, so there is no second copy to keep in sync and no separate field to look up.
+- **Easy to index and query.** The ingest step indexes the 2D shape spatially (for example in PostGIS or OpenSearch) and stores `lower` and `upper` as numeric columns. A 3D query becomes "footprint intersects" plus a range check on the heights.
+- **Volumes have clear lower and upper limits.** This matches the way UTM volumes, NOTAMs, and geofences are commonly described.
+- **The CRS is explicit.** `coordRefSys` on every record says how coordinates and heights should be read, so the CRS can change later without breaking existing data.
+- **GeoJSON and JSON-FG are produced downstream.** The UME is internal storage and clients do not need to read it directly. Downstream services convert records to GeoJSON for visualization, and can build a JSON-FG Prism from a polygon and its `vertical_extent` when a client needs one.
 
 
 ## 13. Standards references
@@ -1304,8 +1325,8 @@ The following standards and specifications are referenced in this review. These 
 
 | Standard / specification | Used for | Reference |
 |---|---|---|
-| **GeoJSON – RFC 7946** | Basic `Feature`, geometry, and coordinate structure | [RFC 7946 – GeoJSON](https://www.rfc-editor.org/info/rfc7946/) |
-| **OGC Features and Geometries JSON (JSON-FG) 1.0** | Extends GeoJSON with features such as `place`, Prism geometry, time, and additional CRS support | [OGC JSON-FG 1.0](https://www.ogc.org/standards/json-fg/) |
+| **GeoJSON – RFC 7946** | Geometry objects and coordinate structure; model for the `id` / `geometry` / `properties` record layout | [RFC 7946 – GeoJSON](https://www.rfc-editor.org/info/rfc7946/) |
+| **OGC Features and Geometries JSON (JSON-FG) 1.0** | Source of the `coordRefSys` convention. Its Prism geometry (lower/upper limits on a footprint) is the model for `vertical_extent`, and can be produced at the API edge | [OGC JSON-FG 1.0](https://www.ogc.org/standards/json-fg/) |
 | **OGC Simple Feature Access** | Defines common geometry concepts such as Point, LineString, Polygon, and geometry collections | [OGC Simple Feature Access](https://www.ogc.org/standards/sfa/) |
 | **OGC API – Features** | API patterns for querying and returning geospatial features; also defines use of CRS84 and CRS84h | [OGC API – Features](https://www.ogc.org/standards/ogcapi-features/) |
 | **RFC 3339** | Date and time format used by UME timestamps | [RFC 3339 – Date and Time on the Internet](https://www.rfc-editor.org/info/rfc3339/) |

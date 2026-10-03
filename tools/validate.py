@@ -63,6 +63,14 @@ def positions(geom):
 def has_z(geom):
     return any(len(p) == 3 for p in positions(geom))
 
+def volumes(geom):
+    """(shape, vertical_extent) for each part of a geometry that has a vertical_extent."""
+    if geom is None:
+        return []
+    if geom["type"] == "GeometryCollection":
+        return [v for g in geom["geometries"] for v in volumes(g)]
+    return [(geom, geom["vertical_extent"])] if "vertical_extent" in geom else []
+
 def flat(geom):
     """The same geometry with heights removed, for comparing footprints."""
     if geom is None:
@@ -75,44 +83,37 @@ def flat(geom):
 
 def normative_rules(rec, where):
     """R1-R6, R10-R11: rules JSON Schema cannot express."""
-    p, g, place = rec["properties"], rec["geometry"], rec.get("place")
+    p, g = rec["properties"], rec["geometry"]
     # R1 span times ordered; R2 span datetime equals start
     if p.get("start_datetime") and p.get("end_datetime") and ts(p["end_datetime"]) < ts(p["start_datetime"]):
         errors.append(f"{where}: R1 end_datetime before start_datetime")
     if p.get("start_datetime") and p["datetime"] != p["start_datetime"]:
         errors.append(f"{where}: R2 datetime must equal start_datetime for spans")
-    # R3 prism limits ordered
-    if place and "lower" in place and "upper" in place and place["lower"] > place["upper"]:
-        errors.append(f"{where}: R3 Prism lower > upper")
-    # R4 geometry and geometry_source go together; place needs a geometry
+    # R3 vertical extent limits ordered; R11 a volume's footprint is 2D (heights only in vertical_extent)
+    for shp, vext in volumes(g):
+        if "lower" in vext and "upper" in vext and vext["lower"] > vext["upper"]:
+            errors.append(f"{where}: R3 vertical_extent lower > upper")
+        if has_z(shp):
+            errors.append(f"{where}: R11 {shp['type']} with vertical_extent must have 2D coordinates")
+    # R4 geometry and geometry_source go together
     if (g is None) != (p["geometry_source"] is None):
         errors.append(f"{where}: R4 geometry and geometry_source must both be null or both set")
-    if place and g is None:
-        errors.append(f"{where}: R4 place requires a geometry (the 2D footprint)")
-    for label, geom in (("geometry", g), ("Prism base", place["base"] if place else None)):
-        if geom is None:
-            continue
+    if g is not None:
         # R5 rings closed
-        for r in rings(geom):
+        for r in rings(g):
             if r[0] != r[-1]:
-                errors.append(f"{where}: R5 {label} polygon ring not closed")
+                errors.append(f"{where}: R5 geometry polygon ring not closed")
         # R6 geometry valid (no self-intersection)
-        if shape is not None and not shape(flat(geom)).is_valid:
-            errors.append(f"{where}: R6 invalid {label}")
+        if shape is not None and not shape(flat(g)).is_valid:
+            errors.append(f"{where}: R6 invalid geometry")
         elif shape is None and "R6" not in " ".join(warnings):
             warnings.append("R6 polygon validity not checked (install shapely); PostGIS ST_IsValid also enforces it")
     # R10 all positions in a geometry have the same dimension
     if g is not None and len({len(pt) for pt in positions(g)}) > 1:
         errors.append(f"{where}: R10 geometry mixes 2D and 3D positions")
-    # R11 a Prism's base is 2D and is the geometry's footprint
-    if place:
-        if has_z(place["base"]):
-            errors.append(f"{where}: R11 Prism base must be 2D")
-        if g is not None and flat(g) != place["base"]:
-            errors.append(f"{where}: R11 Prism base must equal the geometry footprint")
 
 def type_rules(rec, td, where):
-    """R7-R9: kind-specific rules from type.yaml (time, presence of geometry, z, place, entity, assets)."""
+    """R7-R9: kind-specific rules from type.yaml (time, presence of geometry, z, vertical_extent, entity, assets)."""
     p, env, g = rec["properties"], td["envelope"], rec["geometry"]
     if p["kind"] != td["kind"] or p["schema"] != td["schema"]:
         errors.append(f"{where}: kind/schema do not match type definition")
@@ -123,7 +124,7 @@ def type_rules(rec, td, where):
         errors.append(f"{where}: R7 span kind needs start_datetime")
     # R8 presence rules
     zval = True if (g is not None and has_z(g)) else None
-    for field, value in (("geometry", g), ("z", zval), ("place", rec.get("place")), ("entity_id", p.get("entity_id"))):
+    for field, value in (("geometry", g), ("z", zval), ("vertical_extent", True if volumes(g) else None),("entity_id", p.get("entity_id"))):
         rule = env[field]
         if rule == "required" and value is None:
             errors.append(f"{where}: R8 {field} required for this kind")

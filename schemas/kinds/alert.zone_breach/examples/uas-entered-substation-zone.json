@@ -1,5 +1,4 @@
 {
-  "type": "Feature",
   "id": "urn:uuid:01926f45-5c12-7d34-9e56-0a1b2c3d4e5f",
   "geometry": {
     "type": "Point",
@@ -9,7 +8,7 @@
       95.0
     ]
   },
-  "place": null,
+  "coordRefSys": "http://www.opengis.net/def/crs/OGC/0/CRS84h",
   "properties": {
     "ume_version": "1",
     "kind": "alert.zone_breach",

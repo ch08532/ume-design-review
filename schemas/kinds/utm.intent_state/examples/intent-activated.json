@@ -1,8 +1,7 @@
 {
-  "type": "Feature",
   "id": "urn:uuid:01926f4b-f000-7d10-8e20-3a4b5c6d7e8f",
   "geometry": null,
-  "place": null,
+  "coordRefSys": "http://www.opengis.net/def/crs/OGC/0/CRS84h",
   "properties": {
     "ume_version": "1",
     "kind": "utm.intent_state",

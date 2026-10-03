@@ -1,6 +1,6 @@
 # Type definition for utm.volume.
 # envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | forbidden
-# z: heights in geometry positions; place: a JSON-FG Prism for volumes.
+# z: heights in geometry positions; vertical_extent: lower/upper height limits on a 2D Polygon/MultiPolygon geometry (a volume).
 # entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
 kind: utm.volume
 schema: urn:schema:utm:conformance-volume:v1
@@ -11,7 +11,7 @@ envelope:
   geometry_source:
   - defined
   z: forbidden
-  place: required
+  vertical_extent: required
   entity_id: required
   entity_id_template: urn:uuid:{payload.operational_intent_id}
   required_assets: []

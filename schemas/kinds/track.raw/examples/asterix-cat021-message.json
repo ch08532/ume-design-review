@@ -1,5 +1,4 @@
 {
-  "type": "Feature",
   "id": "urn:uuid:01926f3a-7d01-7bb2-b841-39659b8120e5",
   "geometry": {
     "type": "Polygon",
@@ -108,7 +107,7 @@
       ]
     ]
   },
-  "place": null,
+  "coordRefSys": "http://www.opengis.net/def/crs/OGC/0/CRS84h",
   "properties": {
     "ume_version": "1",
     "kind": "track.raw",

@@ -5,7 +5,7 @@
   "description": "Definitions referenced by payload schemas with $ref, e.g. urn:schema:fabric:common:v1#/$defs/altitude. Define once, reuse everywhere.",
   "$defs": {
     "altitude": {
-      "description": "Altitude as published by the source, with datum and units. The envelope geometry z or Prism limits hold the converted WGS-84 ellipsoidal form.",
+      "description": "Altitude as published by the source, with datum and units. The envelope geometry z or the geometry's vertical_extent holds the converted WGS-84 ellipsoidal form.",
       "type": "object",
       "required": [
         "value",

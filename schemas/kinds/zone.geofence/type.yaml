@@ -1,6 +1,6 @@
 # Type definition for zone.geofence.
 # envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | forbidden
-# z: heights in geometry positions; place: a JSON-FG Prism for volumes.
+# z: heights in geometry positions; vertical_extent: lower/upper height limits on a 2D Polygon/MultiPolygon geometry (a volume).
 # entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
 kind: zone.geofence
 schema: urn:schema:zones:geofence:v1
@@ -11,7 +11,7 @@ envelope:
   geometry_source:
   - defined
   z: forbidden
-  place: required
+  vertical_extent: required
   entity_id: required
   required_assets: []
 source_event_id: Zone registry ID + version

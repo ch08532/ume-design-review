@@ -1,5 +1,4 @@
 {
-  "type": "Feature",
   "id": "urn:uuid:01926f30-0000-7a01-8b02-0c0d0e0f1011",
   "geometry": {
     "type": "Polygon",
@@ -26,38 +25,10 @@
           45.3915
         ]
       ]
-    ]
-  },
-  "place": {
-    "type": "Prism",
-    "base": {
-      "type": "Polygon",
-      "coordinates": [
-        [
-          [
-            -75.709,
-            45.3915
-          ],
-          [
-            -75.701,
-            45.3915
-          ],
-          [
-            -75.701,
-            45.396
-          ],
-          [
-            -75.709,
-            45.396
-          ],
-          [
-            -75.709,
-            45.3915
-          ]
-        ]
-      ]
-    },
-    "upper": 190.0
+    ],
+    "vertical_extent": {
+      "upper": 190.0
+    }
   },
   "coordRefSys": "http://www.opengis.net/def/crs/OGC/0/CRS84h",
   "properties": {

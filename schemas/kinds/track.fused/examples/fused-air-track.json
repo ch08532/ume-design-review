@@ -1,5 +1,4 @@
 {
-  "type": "Feature",
   "id": "urn:uuid:01926f3a-8e10-7c32-b7e1-8890cf2b6941",
   "geometry": {
     "type": "Point",
@@ -9,7 +8,7 @@
       3200.5
     ]
   },
-  "place": null,
+  "coordRefSys": "http://www.opengis.net/def/crs/OGC/0/CRS84h",
   "properties": {
     "ume_version": "1",
     "kind": "track.fused",

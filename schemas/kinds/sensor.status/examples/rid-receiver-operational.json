@@ -1,5 +1,4 @@
 {
-  "type": "Feature",
   "id": "urn:uuid:01926f40-0000-7c00-8d00-5e6f7a8b9c0d",
   "geometry": {
     "type": "Polygon",
@@ -108,7 +107,7 @@
       ]
     ]
   },
-  "place": null,
+  "coordRefSys": "http://www.opengis.net/def/crs/OGC/0/CRS84h",
   "properties": {
     "ume_version": "1",
     "kind": "sensor.status",

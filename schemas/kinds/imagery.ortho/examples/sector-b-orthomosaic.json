@@ -1,5 +1,4 @@
 {
-  "type": "Feature",
   "id": "urn:uuid:01926f3b-2c51-7f32-ad5e-3a2b9c7d4e81",
   "geometry": {
     "type": "Polygon",
@@ -33,7 +32,7 @@
       ]
     ]
   },
-  "place": null,
+  "coordRefSys": "http://www.opengis.net/def/crs/OGC/0/CRS84h",
   "properties": {
     "ume_version": "1",
     "kind": "imagery.ortho",

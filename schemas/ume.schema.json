@@ -1,40 +1,28 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:schema:fabric:ume:v1",
-  "title": "Universal Metadata Envelope (UME) v1 — JSON profile (GeoJSON / JSON-FG)",
-  "description": "Normative JSON representation of a Data Fabric record, as a GeoJSON Feature with JSON-FG extensions (place, Prism, coordRefSys) for 3D. The logical model is independent of this profile; Protobuf and SQL are other representations. The payload is validated separately against the schema named in properties.schema. Cross-field rules are checked by tools/validate.py.",
+  "title": "Universal Metadata Envelope (UME) v1 — JSON profile",
+  "description": "Normative JSON representation of a Data Fabric record. The layout (id, geometry, properties) and geometry objects follow GeoJSON (RFC 7946) practice, but a record is not itself a GeoJSON Feature; downstream services convert to GeoJSON (or JSON-FG, e.g. a Prism for volumes) for visualization. Every record states its coordRefSys. A volume is a 2D Polygon or MultiPolygon carrying a vertical_extent (lower, upper) member. The logical model is independent of this profile; Protobuf and SQL are other representations. The payload is validated separately against the schema named in properties.schema. Cross-field rules are checked by tools/validate.py.",
   "type": "object",
   "required": [
-    "type",
     "id",
     "geometry",
+    "coordRefSys",
     "properties"
   ],
   "additionalProperties": false,
   "properties": {
-    "type": {
-      "const": "Feature"
-    },
     "id": {
       "$ref": "#/$defs/uuidV7Urn"
     },
     "geometry": {
       "$ref": "#/$defs/geometry"
     },
-    "place": {
-      "description": "JSON-FG place: geometry GeoJSON can't express. Used for volumes (Prism); null otherwise.",
-      "oneOf": [
-        {
-          "$ref": "#/$defs/prism"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    },
     "coordRefSys": {
-      "const": "http://www.opengis.net/def/crs/OGC/0/CRS84h",
-      "description": "JSON-FG coordinate reference system: lon, lat, ellipsoidal height in metres."
+      "enum": [
+        "http://www.opengis.net/def/crs/OGC/0/CRS84h"
+      ],
+      "description": "Coordinate reference system of every position in geometry and of any vertical_extent on it. CRS84h: lon, lat in degrees (WGS-84), height in metres above the WGS-84 ellipsoid. Required so each record states its CRS; further CRSs are added to this enum."
     },
     "properties": {
       "$ref": "#/$defs/umeProperties"
@@ -448,7 +436,7 @@
         },
         "vertical_approximate": {
           "type": "boolean",
-          "description": "True when heights (z or Prism limits) were converted using assumptions, e.g. flight levels via the standard atmosphere."
+          "description": "True when heights (z or a geometry's vertical_extent) were converted using assumptions, e.g. flight levels via the standard atmosphere."
         },
         "source": {
           "$ref": "#/$defs/source"
@@ -801,7 +789,7 @@
           "type": "number"
         }
       ],
-      "description": "[lon, lat] or [lon, lat, h]: WGS-84, h in metres above the ellipsoid (OGC:CRS84 / CRS84h, as GeoJSON defines). All positions in one geometry must have the same dimension (validator rule R10)."
+      "description": "[lon, lat] or [lon, lat, h], interpreted in the record's coordRefSys (CRS84h: WGS-84 degrees, h in metres above the ellipsoid). All positions in one geometry must have the same dimension (validator rule R10)."
     },
     "linearRing": {
       "type": "array",
@@ -906,6 +894,9 @@
           "items": {
             "$ref": "#/$defs/linearRing"
           }
+        },
+        "vertical_extent": {
+          "$ref": "#/$defs/verticalExtent"
         }
       }
     },
@@ -929,6 +920,9 @@
               "$ref": "#/$defs/linearRing"
             }
           }
+        },
+        "vertical_extent": {
+          "$ref": "#/$defs/verticalExtent"
         }
       }
     },
@@ -974,7 +968,7 @@
       ]
     },
     "geometry": {
-      "description": "GeoJSON geometry, 2D or 3D, or null for non-spatial kinds. For volumes this is the 2D footprint, and the full volume is in place.",
+      "description": "GeoJSON-style geometry, 2D or 3D, or null for non-spatial kinds. A volume is a 2D Polygon or MultiPolygon footprint with a vertical_extent member.",
       "oneOf": [
         {
           "$ref": "#/$defs/simpleGeometry"
@@ -987,34 +981,11 @@
         }
       ]
     },
-    "prism": {
-      "description": "JSON-FG Prism: a 2D base extruded between lower and upper heights (metres above the WGS-84 ellipsoid). An omitted limit is unbounded. lower <= upper and base == geometry are checked by the validator.",
+    "verticalExtent": {
+      "description": "Height limits of a volume, on a Polygon or MultiPolygon geometry (also inside a GeometryCollection): the shape's 2D coordinates are the footprint, extruded between lower and upper in the vertical reference of coordRefSys (CRS84h: metres above the WGS-84 ellipsoid). An omitted limit is unbounded. lower <= upper, and 2D coordinates on a shape with a vertical extent, are checked by the validator. Not part of GeoJSON; downstream converters drop it or turn it into a JSON-FG Prism.",
       "type": "object",
-      "required": [
-        "type",
-        "base"
-      ],
       "additionalProperties": false,
       "properties": {
-        "type": {
-          "const": "Prism"
-        },
-        "base": {
-          "oneOf": [
-            {
-              "$ref": "#/$defs/polygon"
-            },
-            {
-              "$ref": "#/$defs/multiPolygon"
-            },
-            {
-              "$ref": "#/$defs/point"
-            },
-            {
-              "$ref": "#/$defs/lineString"
-            }
-          ]
-        },
         "lower": {
           "type": "number"
         },
