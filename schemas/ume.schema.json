@@ -538,7 +538,8 @@
       "properties": {
         "origin": {
           "type": "string",
-          "pattern": "^urn:source:"
+          "pattern": "^urn:source:",
+          "description": "Sensor or service the data first came from; a shortcut so lineage need not be followed through derived_from. Equals source.id for first-hand records. For derived records, the main input source (the producer picks one when several contribute equally; derived_from holds the full set). Always a system, never a person (see creator)."
         },
         "derived_from": {
           "type": "array",

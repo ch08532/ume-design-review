@@ -338,7 +338,7 @@ A simple provenance structure could look like:
 
 | Field | Required | Meaning |
 |---|---|---|
-| `origin` | Yes | The sensor or service the underlying data first came from. It equals `source.id` for first-hand records. For derived records, it can differ: here the tracker (`source.id`) produced the record from flightline sensor data (`origin`). |
+| `origin` | Yes | The sensor or service the data first came from, as a quick way to see it without following `derived_from`. For first-hand records, it is the same as `source.id`. For derived records, it is the main input source: here the tracker (`source.id`) built the record from flightline sensor data (`origin`). When several sources contributed equally, the producer chooses the main one, and `derived_from` holds the full list. `origin` is always a system, never a person (see `creator`). |
 | `derived_from` | Yes (may be empty) | The records that were used to create this one. |
 | `revision_of` | No | The earlier record that this one corrects or replaces. |
 | `produced_by` | Yes | The software or service that created the record. |
