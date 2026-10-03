@@ -194,7 +194,7 @@ The current UME design already supports GeoJSON geometry and different coordinat
 | ID | Finding | Suggested change |
 |---|---|---|
 | **S1** | Height can be interpreted differently depending on the CRS and `altitude_type`. A client may need to check several fields before it knows what the third coordinate means. | Use one consistent vertical model. Store 3D positions as longitude, latitude, and WGS-84 ellipsoidal height. Keep source-specific values such as pressure altitude in the payload. Represent volumes as a 2D polygon footprint whose geometry carries a `vertical_extent` with lower and upper height limits. |
-| **S2** | The design allows `spatial` to be `null`, but it does not clearly define which data types require geometry and which do not. | Define the geometry rules for each `kind`: `required`, `optional`, or `forbidden`. This avoids adding made-up locations to records that do not have a meaningful position. |
+| **S2** | The design allows `spatial` to be `null`, but it does not clearly define which data types require geometry and which do not. | Define the geometry rules for each `kind`: `required`, `optional`, or `not_allowed`. This avoids adding made-up locations to records that do not have a meaningful position. |
 | **S3** | Raw sensor data may not yet contain a known target position. Using a target point before the message is parsed could make spatial queries misleading. | If the target position is unknown, use the sensor location or sensor coverage area when useful, and clearly identify where the geometry came from with `geometry_source`. |
 | **S4** | `confidence` is a value from `0.0` to `1.0`, but the design does not define exactly what that number means. | Use a clearly defined field such as `position_error_m` for position accuracy. If other confidence values are needed, keep them in the payload and define their meaning in the payload schema. |
 | **S5** | `domain` mixes physical operating areas such as `AIR`, `LAND`, and `SPACE` with categories such as `CYBER`, `ENVIRONMENTAL`, and `LOGISTICS`. | Decide what `domain` is intended to represent and keep the list consistent. If it represents physical operating domains, keep other categories in the payload or another field. |
@@ -979,19 +979,19 @@ envelope:
   time: instant                    # instant | span
 
   # A fused track must include geometry
-  geometry: required               # required | optional | forbidden
+  geometry: required               # required | optional | not_allowed
 
   # The geometry represents an observed position
   geometry_source: [observed]      # allowed geometry source values
 
   # Height may be included as the third coordinate: [lon, lat, height]
-  z: optional                      # required | optional | forbidden
+  z: optional                      # required | optional | not_allowed
 
   # Fused tracks are not volumes, so they have no vertical extent
-  vertical_extent: forbidden       # required | optional | forbidden
+  vertical_extent: not_allowed     # required | optional | not_allowed
 
   # The record must identify the track it belongs to
-  entity_id: required              # required | optional | forbidden
+  entity_id: required              # required | optional | not_allowed
 
   # Defines how the track entity ID is created from the payload
   entity_id_template: urn:track:{payload.track_id}

@@ -1,5 +1,5 @@
 # Type definition for alert.zone_breach.
-# envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | forbidden
+# envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | not_allowed
 # z: heights in geometry positions; vertical_extent: lower/upper height limits on a 2D Polygon/MultiPolygon geometry (a volume).
 # entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
 kind: alert.zone_breach
@@ -11,7 +11,7 @@ envelope:
   geometry_source:
   - observed
   z: optional
-  vertical_extent: forbidden
+  vertical_extent: not_allowed
   entity_id: required
   entity_id_template: '{id}'
   required_assets: []

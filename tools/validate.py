@@ -128,7 +128,7 @@ def type_rules(rec, td, where):
         rule = env[field]
         if rule == "required" and value is None:
             errors.append(f"{where}: R8 {field} required for this kind")
-        if rule == "forbidden" and value is not None:
+        if rule == "not_allowed" and value is not None:
             errors.append(f"{where}: R8 {field} not allowed for this kind")
     if g is not None and p["geometry_source"] not in env["geometry_source"]:
         errors.append(f"{where}: R8 geometry_source {p['geometry_source']} not allowed")

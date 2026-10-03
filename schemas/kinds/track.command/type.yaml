@@ -1,5 +1,5 @@
 # Type definition for track.command.
-# envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | forbidden
+# envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | not_allowed
 # z: heights in geometry positions; vertical_extent: lower/upper height limits on a 2D Polygon/MultiPolygon geometry (a volume).
 # entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
 kind: track.command
@@ -10,8 +10,8 @@ envelope:
   geometry: optional
   geometry_source:
   - observed
-  z: forbidden
-  vertical_extent: forbidden
+  z: not_allowed
+  vertical_extent: not_allowed
   entity_id: optional
   required_assets: []
 source_event_id: Console command ID

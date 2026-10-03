@@ -1,5 +1,5 @@
 # Type definition for video.segment.
-# envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | forbidden
+# envelope: rules the envelope must meet (checked by tools/validate.py). required | optional | not_allowed
 # z: heights in geometry positions; vertical_extent: lower/upper height limits on a 2D Polygon/MultiPolygon geometry (a volume).
 # entity_id_template: how entity_id is derived ({id}, {source.id} or {payload.<field>}).
 kind: video.segment
@@ -12,8 +12,8 @@ envelope:
   - observed
   - sensor
   z: optional
-  vertical_extent: forbidden
-  entity_id: forbidden
+  vertical_extent: not_allowed
+  entity_id: not_allowed
   required_assets:
   - data
 source_event_id: Sensor ID + segment start time
