@@ -36,16 +36,14 @@
     "kind": "zone.geofence",
     "schema": "urn:schema:zones:geofence:v1",
     "entity_id": "urn:zone:northgrid:substation-b",
-    "datetime": "2026-01-01T00:00:00.000Z",
-    "start_datetime": "2026-01-01T00:00:00.000Z",
-    "end_datetime": null,
-    "times": {
-      "source_at": "2025-12-15T14:00:00.000Z",
-      "sent_at": "2025-12-15T14:00:00.000Z",
-      "received_at": "2025-12-15T14:00:01.020Z",
-      "stored_at": "2025-12-15T14:00:01.090Z"
+    "temporal": {
+      "datetime": "2026-01-01T00:00:00.000Z",
+      "end_datetime": null,
+      "times": {
+        "source_at": "2025-12-15T14:00:00.000Z",
+        "received_at": "2025-12-15T14:00:01.020Z"
+      }
     },
-    "expires_at": null,
     "geometry_source": "defined",
     "position_error_m": null,
     "domain": "AIR",

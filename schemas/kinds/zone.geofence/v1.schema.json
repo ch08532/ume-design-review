@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:schema:zones:geofence:v1",
   "title": "Payload: geofence zone v1",
-  "description": "A protected, restricted or monitored area. Footprint is the envelope geometry, active period is start/end_datetime (open end = permanent), height limits are the geometry's vertical_extent (converted heights).",
+  "description": "A protected, restricted or monitored area. Footprint is the envelope geometry, active period is temporal.datetime/end_datetime (open end = permanent), height limits are the geometry's vertical_extent (converted heights).",
   "type": "object",
   "required": [
     "zone_name",

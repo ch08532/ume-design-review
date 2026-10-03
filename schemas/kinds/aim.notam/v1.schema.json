@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:schema:aim:notam:v1",
   "title": "Payload: NOTAM v1",
-  "description": "Payload for kind aim.notam. Items B/C map to start/end_datetime, the area to the envelope geometry (circles as polygons); the original text or AIXM goes in assets.",
+  "description": "Payload for kind aim.notam. Items B/C map to temporal.datetime/end_datetime, the area to the envelope geometry (circles as polygons); the original text or AIXM goes in assets.",
   "type": "object",
   "required": [
     "notam_id",

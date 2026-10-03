@@ -14,16 +14,14 @@
     "kind": "alert.zone_breach",
     "schema": "urn:schema:alert:zone-breach:v1",
     "entity_id": "urn:uuid:01926f45-5c12-7d34-9e56-0a1b2c3d4e5f",
-    "datetime": "2026-09-23T18:05:12.400Z",
-    "start_datetime": null,
-    "end_datetime": null,
-    "times": {
-      "source_at": "2026-09-23T18:05:12.430Z",
-      "sent_at": "2026-09-23T18:05:12.440Z",
-      "received_at": "2026-09-23T18:05:12.452Z",
-      "stored_at": "2026-09-23T18:05:12.460Z"
+    "temporal": {
+      "datetime": "2026-09-23T18:05:12.400Z",
+      "end_datetime": null,
+      "times": {
+        "source_at": "2026-09-23T18:05:12.430Z",
+        "received_at": "2026-09-23T18:05:12.452Z"
+      }
     },
-    "expires_at": null,
     "geometry_source": "observed",
     "position_error_m": 15.0,
     "domain": "AIR",

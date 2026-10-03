@@ -37,16 +37,14 @@
     "ume_version": "1",
     "kind": "imagery.ortho",
     "schema": "urn:schema:imagery:ortho:v1",
-    "datetime": "2026-09-23T17:45:10.000Z",
-    "start_datetime": "2026-09-23T17:45:10.000Z",
-    "end_datetime": "2026-09-23T17:47:40.000Z",
-    "times": {
-      "source_at": "2026-09-23T17:48:30.000Z",
-      "sent_at": "2026-09-23T17:48:31.200Z",
-      "received_at": "2026-09-23T17:48:31.400Z",
-      "stored_at": "2026-09-23T17:49:02.800Z"
+    "temporal": {
+      "datetime": "2026-09-23T17:45:10.000Z",
+      "end_datetime": "2026-09-23T17:47:40.000Z",
+      "times": {
+        "source_at": "2026-09-23T17:48:30.000Z",
+        "received_at": "2026-09-23T17:48:31.400Z"
+      }
     },
-    "expires_at": null,
     "geometry_source": "observed",
     "position_error_m": 1.5,
     "domain": "LAND",

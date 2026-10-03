@@ -144,7 +144,7 @@ The following are the main issues I found in the current UME design. None of the
 |---|---|---|
 | **PF1** | Track-specific fields such as `spatial.track` are part of the common UME structure, even though most other data types do not need them. | Move track-specific fields into the track payload. Tracks can still be a standard UME type, but they should not be built into the common envelope. |
 | **PF2** | Raw binary track data can be stored as base64 inside the UME record. This makes the record larger and can create a lot of extra data at normal sensor update rates. | Avoid storing raw binary directly in UME records where possible. Send it on the messaging backbone or store it separately as a file or short-retention raw-data record when it needs to be kept. |
-| **PF3** | The current time fields do not clearly separate when the real-world event happened from when the data was sent, received, or stored. There is also no common way to show a start and end time. | Add `datetime` for when an event happened and `start_datetime` / `end_datetime` for things that last over a period of time. Keep the processing timestamps together in a separate `times` section. |
+| **PF3** | The current time fields do not clearly separate when the real-world event happened from when the data was sent, received, or stored. There is also no common way to show a start and end time. | Keep all time fields in one `temporal` section with four fields: `datetime` (when it happened, or when a period starts), `end_datetime` (when a period ends), and the pipeline times `times.source_at` and `times.received_at`. |
 | **PF4** | Height can be interpreted differently depending on the CRS and `altitude_type`. This makes it harder for clients to know exactly what the third coordinate means. | Use one consistent height model for UME geometry. Store 3D positions as longitude, latitude, and WGS-84 ellipsoidal height. Keep source values such as pressure altitude in the payload. Represent volumes as a 2D polygon footprint whose geometry carries a `vertical_extent` with lower and upper height limits. State the CRS on every record in `coordRefSys`. |
 | **PF5** | The `index` field is a single increasing number across UME records. This requires coordination between nodes and can be difficult when sites are disconnected. | Remove the global counter and use globally unique record IDs such as UUIDv7. Use a separate source event ID to detect duplicate source messages. |
 | **PF6** | The current UME JSON structure is close to GeoJSON, but still uses its own custom structure. This makes geometry handling and conversion less straightforward than it needs to be. | Follow GeoJSON practice without requiring the UME to be GeoJSON: use an `id` / `geometry` / `properties` layout, standard GeoJSON geometry objects, and an explicit `coordRefSys`. The UME is internal storage. Downstream services convert records to GeoJSON (or OGC JSON-FG, for example a Prism for volumes) for visualization. |
@@ -161,31 +161,54 @@ The current UME design already records several useful processing times. The main
 
 | ID | Finding | Suggested change |
 |---|---|---|
-| **T1** | There is no single field that clearly means “when the real-world event happened.” `sourced_at` can mean either when the source received the data or when it produced it. | Add `datetime` as the main event or observation time. Keep `sourced_at` for the source processing time. |
-| **T2** | There is no common way to represent data that applies over a period of time, such as a video segment, zone, outage, or UTM volume. | Add `start_datetime` and `end_datetime` for records that have a time range. |
+| **T1** | There is no single field that clearly means “when the real-world event happened.” `sourced_at` can mean either when the source received the data or when it produced it. | Add `datetime` as the main event or observation time. Keep `sourced_at`, renamed `source_at`, for when the source produced the message. |
+| **T2** | There is no common way to represent data that applies over a period of time, such as a video segment, zone, outage, or UTM volume. | Add `end_datetime`. A period is then `datetime` (its start) plus `end_datetime`. |
 | **T3** | `observed_at` currently means when the ingestion platform received the data. The name can be confused with the time the real-world event was observed. | Rename it to `received_at` so its meaning is clear. |
-| **T4** | `broadcasted` means when the source sent the data, but the name is more specific than needed. | Rename it to `sent_at`, which works for any transport or protocol. |
-| **T5** | `valid_until` can be used for both data validity and storage retention. These are different concepts. | Use `end_datetime` for when the data stops being valid. Handle normal retention by `kind`, and use `expires_at` only when an individual record needs its own expiry time. |
+| **T4** | `broadcasted` and `sourced_at` are both times on the source side, a few milliseconds apart. Most sources only stamp one of them. | Keep one source-side time, `source_at`, and drop `broadcasted`. |
+| **T5** | `valid_until` can be used for both data validity and storage retention. These are different concepts. | Use `end_datetime` for when the data stops being valid. Handle retention by `kind` in the platform, not per record. |
+| **T6** | `ingested_at` records when the data was written to storage. That is a property of each stored copy, not of the data. A record replicated to another node is stored there at a different time. | Drop it from the record. The database keeps its own insert time for each copy. |
 
-The processing times can then be grouped together under `times`:
+All time fields sit in one `temporal` section, as they do in the current design. Four fields are enough:
 
 ```json
-"datetime": "2026-09-23T17:46:01.200Z",
-"times": {
-  "source_at": "2026-09-23T17:46:01.205Z",
-  "sent_at": "2026-09-23T17:46:01.210Z",
-  "received_at": "2026-09-23T17:46:01.215Z",
-  "stored_at": "2026-09-23T17:46:01.230Z"
+"temporal": {
+  "datetime": "2026-09-23T17:46:01.200Z",
+  "end_datetime": null,
+  "times": {
+    "source_at": "2026-09-23T17:46:01.205Z",
+    "received_at": "2026-09-23T17:46:01.215Z"
+  }
 }
 ```
 
-This keeps the difference clear:
+| Field | What it means | OGC equivalent | Example (fused track) |
+|---|---|---|---|
+| `datetime` | **When it happened.** The moment of a detection, track position, or operator action. For something that lasts a period, it is the start. If the source does not give an event time, use `source_at`, or `received_at` if that is all there is. Always set. | **phenomenonTime** for observations. For defined things, such as a zone, NOTAM or volume, the start of **validTime**. | 17:46:01.200, the time of the track position |
+| `end_datetime` | **When it stops applying.** Only for things that last a period, such as a video segment, flight volume, NOTAM or zone. Always null for single moments. On a period, null means it has no end yet, for example a permanent zone. | The end of **phenomenonTime** (for example a video segment) or of **validTime** (for example a zone). | null |
+| `times.source_at` | **When the source produced it.** The time on the source system's own clock when it created the message. | **resultTime** | 17:46:01.205, Trackgen output the update |
+| `times.received_at` | **When the Data Fabric got it.** The time ingest first received the message. Always set. | None. This is a platform time. | 17:46:01.215 |
 
-- `datetime` = when the event happened. It is always the best available event time: the source's own event time if it provides one, otherwise `source_at`, otherwise `received_at`.
-- `source_at` = when the source received or produced the data
-- `sent_at` = when the source sent it
-- `received_at` = when the platform received it
-- `stored_at` = when it was written to storage
+The OGC terms come from Observations and Measurements (ISO 19156 / OGC SensorThings):
+
+- **phenomenonTime** is when the observed thing happened.
+- **resultTime** is when the result was produced.
+- **validTime** is the period during which a result or definition applies.
+
+Records that are not observations, such as operator actions or analysis results, use `datetime` simply as the time the action happened.
+
+**Single moment or period?** Each kind's type definition says whether its records are single moments or periods (`time: instant` or `time: span`). This is what tells a reader how to interpret `end_datetime: null`:
+
+| Kind is… | `datetime` | `end_datetime` | Example |
+|---|---|---|---|
+| A single moment | When it happened | Always null | Track position, detection, alert, command |
+| A period with an end | Start | End | Video segment 17:45:10–17:45:20, UTM volume 18:00–18:25 |
+| A period with no end | Start | Null | Permanent protection zone |
+
+**How the fields are used:**
+
+- **Searching and sorting** use `datetime`. To find everything active at a given time, `T`, select records where `datetime ≤ T` and `end_datetime` is null or `≥ T`.
+- **Real-world timing** comes from `datetime` and `end_datetime` only. The pipeline times are never used as the event time.
+- **Delay** comes from the gaps between the three times. `source_at − datetime` is how long the source took to report the event. `received_at − source_at` is the time spent in transport. `received_at − datetime` is the total delay.
 
 ### 6.2 Spatial
 
@@ -410,8 +433,9 @@ id              uuid
 kind            text
 entity_id       text
 datetime        timestamptz
-start_datetime  timestamptz
 end_datetime    timestamptz
+received_at     timestamptz
+stored_at       timestamptz   -- set by the database on insert, not part of the record
 geometry        PostGIS geometry
 source_id       text
 source_node     text
@@ -702,16 +726,14 @@ This example shows how a fused track from a sensor, such as ADS-B, could be repr
     "kind": "track.fused",
     "schema": "urn:schema:tracks:fused-kinematics:v1",
     "entity_id": "urn:track:site-a:9421",
-    "datetime": "2026-09-23T17:46:01.200Z",
-    "start_datetime": null,
-    "end_datetime": null,
-    "times": {
-      "source_at": "2026-09-23T17:46:01.205Z",
-      "sent_at": "2026-09-23T17:46:01.210Z",
-      "received_at": "2026-09-23T17:46:01.215Z",
-      "stored_at": "2026-09-23T17:46:01.230Z"
+    "temporal": {
+      "datetime": "2026-09-23T17:46:01.200Z",
+      "end_datetime": null,
+      "times": {
+        "source_at": "2026-09-23T17:46:01.205Z",
+        "received_at": "2026-09-23T17:46:01.215Z"
+      }
     },
-    "expires_at": null,
     "geometry_source": "observed",
     "position_error_m": 12.0,
     "domain": "AIR",
@@ -778,12 +800,12 @@ The table below shows how fields in the current UME design would map to the prop
 | `uuid` | `id` becomes the unique UUIDv7 for this record. |
 | Not currently defined | `source.event_id` identifies the original source event and helps detect duplicate records. |
 | Not currently defined | `entity_id` identifies the real-world thing the record is about, such as a track, sensor, alert, or zone. |
-| `temporal.sourced_at` | `times.source_at` |
-| `temporal.broadcasted` | `times.sent_at` |
-| `temporal.observed_at` | `times.received_at` |
-| `temporal.ingested_at` | `times.stored_at` |
-| Not currently defined | `datetime`, `start_datetime`, and `end_datetime` describe when the record applies. |
-| `temporal.valid_until` | `end_datetime` when it means the data stops being valid; `expires_at` only when it is a per-record retention override (T5). |
+| `temporal.sourced_at` | `temporal.times.source_at` |
+| `temporal.broadcasted` | Removed. `temporal.times.source_at` is the single source-side time (T4). |
+| `temporal.observed_at` | `temporal.times.received_at` |
+| `temporal.ingested_at` | Removed from the record. The database keeps the insert time for each stored copy (T6). |
+| Not currently defined | `temporal.datetime` (when it happened, or a period's start) and `temporal.end_datetime` (a period's end) describe when the record applies. |
+| `temporal.valid_until` | `temporal.end_datetime` when it means the data stops being valid. Retention is set per `kind` (T5). |
 | `temporal.index` / `spatial.track.index` | Removed. These are no longer needed in the record. |
 | `spatial.geometry` | Moves to the top-level `geometry` field. It can be 2D or 3D, or `null` when the `kind` allows it. |
 | Geometry height / `altitude_type` | Height is stored as the third geometry coordinate for points and lines. Volumes use a 2D polygon footprint with a `vertical_extent` on the geometry. Original altitude values can still be kept in the payload. |
@@ -1099,7 +1121,7 @@ This means a moving track can have many UME records over time, all sharing the s
 
 The UME record describes the video segment, while the actual files are referenced through `assets`.
 
-- **Time** — `start_datetime` and `end_datetime` define when the video segment was recorded.
+- **Time** — `datetime` and `end_datetime` define when the video segment was recorded (start and end).
 - **Geometry** — the geometry represents the area on the ground visible in the video.
 - **Sensor position** — the UAV or camera position is kept separately in the payload.
 - **Provenance** — because this is source data, `derived_from` is empty.
@@ -1135,7 +1157,7 @@ In this example, the volume represents a BVLOS operation west of Ottawa from 18:
 |---|---|
 | Flight area | `geometry` contains the 2D footprint. |
 | 3D volume | The geometry's `vertical_extent` contains the lower and upper height limits. |
-| Active time | `start_datetime` and `end_datetime` define when the volume applies. |
+| Active time | `datetime` (start) and `end_datetime` (end) define when the volume applies. |
 | Operational intent | All records for the same intent share the same `entity_id`. |
 | Volume type | `volume_type` identifies the volume as `nominal` or `off_nominal`. |
 | Updated volume | A new record is created. `revision_of` can point to the previous version. |
@@ -1192,7 +1214,7 @@ In this example, the NOTAM:
 
 | Concept | How it is represented |
 |---|---|
-| Active time | `start_datetime` and `end_datetime` |
+| Active time | `datetime` (start) and `end_datetime` (end) |
 | Schedule | Additional schedule information stays in the payload |
 | Area | `geometry` contains the area used for spatial searches |
 | Height limits | The geometry's `vertical_extent` contains the vertical limits |
@@ -1368,6 +1390,7 @@ The following standards and specifications are referenced in this review. These 
 |---|---|---|
 | **GeoJSON – RFC 7946** | Geometry objects and coordinate structure; model for the `id` / `geometry` / `properties` record layout | [RFC 7946 – GeoJSON](https://www.rfc-editor.org/info/rfc7946/) |
 | **OGC Features and Geometries JSON (JSON-FG) 1.0** | Source of the `coordRefSys` convention. Its Prism geometry (lower/upper limits on a footprint) is the model for `vertical_extent`, and can be produced at the API edge | [OGC JSON-FG 1.0](https://www.ogc.org/standards/json-fg/) |
+| **OGC / ISO 19156 Observations and Measurements** (also used by OGC SensorThings) | Time concepts phenomenonTime, resultTime and validTime, mapped to `temporal` fields in 6.1 | [OGC Observations, Measurements and Samples](https://www.ogc.org/standards/om/) |
 | **OGC Simple Feature Access** | Defines common geometry concepts such as Point, LineString, Polygon, and geometry collections | [OGC Simple Feature Access](https://www.ogc.org/standards/sfa/) |
 | **OGC API – Features** | API patterns for querying and returning geospatial features; also defines use of CRS84 and CRS84h | [OGC API – Features](https://www.ogc.org/standards/ogcapi-features/) |
 | **RFC 3339** | Date and time format used by UME timestamps | [RFC 3339 – Date and Time on the Internet](https://www.rfc-editor.org/info/rfc3339/) |

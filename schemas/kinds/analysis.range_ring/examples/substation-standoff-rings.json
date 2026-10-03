@@ -13,16 +13,14 @@
     "kind": "analysis.range_ring",
     "schema": "urn:schema:analysis:range-ring:v1",
     "entity_id": "urn:uuid:2c4d6e8f-1a3b-4c5d-8e7f-9a0b1c2d3e4f",
-    "datetime": "2026-09-23T18:07:00.000Z",
-    "start_datetime": null,
-    "end_datetime": null,
-    "times": {
-      "source_at": "2026-09-23T18:07:00.000Z",
-      "sent_at": "2026-09-23T18:07:00.014Z",
-      "received_at": "2026-09-23T18:07:00.029Z",
-      "stored_at": "2026-09-23T18:07:00.040Z"
+    "temporal": {
+      "datetime": "2026-09-23T18:07:00.000Z",
+      "end_datetime": null,
+      "times": {
+        "source_at": "2026-09-23T18:07:00.000Z",
+        "received_at": "2026-09-23T18:07:00.029Z"
+      }
     },
-    "expires_at": null,
     "geometry_source": "defined",
     "position_error_m": null,
     "domain": "LAND",

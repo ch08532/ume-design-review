@@ -7,16 +7,14 @@
     "kind": "alert.state_change",
     "schema": "urn:schema:alert:state-change:v1",
     "entity_id": "urn:uuid:01926f45-5c12-7d34-9e56-0a1b2c3d4e5f",
-    "datetime": "2026-09-23T18:05:30.000Z",
-    "start_datetime": null,
-    "end_datetime": null,
-    "times": {
-      "source_at": "2026-09-23T18:05:30.000Z",
-      "sent_at": "2026-09-23T18:05:30.015Z",
-      "received_at": "2026-09-23T18:05:30.030Z",
-      "stored_at": "2026-09-23T18:05:30.041Z"
+    "temporal": {
+      "datetime": "2026-09-23T18:05:30.000Z",
+      "end_datetime": null,
+      "times": {
+        "source_at": "2026-09-23T18:05:30.000Z",
+        "received_at": "2026-09-23T18:05:30.030Z"
+      }
     },
-    "expires_at": null,
     "geometry_source": null,
     "position_error_m": null,
     "domain": null,

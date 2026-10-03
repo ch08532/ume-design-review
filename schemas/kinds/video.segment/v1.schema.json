@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:schema:video:fmv-segment:v1",
   "title": "Payload: FMV video segment v1",
-  "description": "Payload for kind video.segment. Time span is in the envelope (start/end_datetime), the ground footprint in the envelope geometry, and the files in assets.",
+  "description": "Payload for kind video.segment. Time span is in the envelope (temporal.datetime/end_datetime), the ground footprint in the envelope geometry, and the files in assets.",
   "type": "object",
   "required": [
     "duration_s",

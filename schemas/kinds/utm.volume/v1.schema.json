@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:schema:utm:conformance-volume:v1",
   "title": "Payload: UTM operational intent volume v1",
-  "description": "One 4D volume of an operational intent (ASTM F3548 concepts). Footprint is the envelope geometry, time span is start/end_datetime, height limits are the geometry's vertical_extent (converted heights); original altitudes are kept here. State changes are utm.intent_state records; a new intent version supersedes the previous volumes (revision_of).",
+  "description": "One 4D volume of an operational intent (ASTM F3548 concepts). Footprint is the envelope geometry, time span is temporal.datetime/end_datetime, height limits are the geometry's vertical_extent (converted heights); original altitudes are kept here. State changes are utm.intent_state records; a new intent version supersedes the previous volumes (revision_of).",
   "type": "object",
   "required": [
     "operational_intent_id",

@@ -340,8 +340,7 @@
         "ume_version",
         "kind",
         "schema",
-        "datetime",
-        "times",
+        "temporal",
         "geometry_source",
         "source",
         "provenance",
@@ -370,21 +369,8 @@
           "pattern": "^urn:",
           "description": "The thing this record is about (a track, alert, operational intent, sensor, zone). Records sharing an entity_id form its history; the latest-state projection is keyed on it. Whether it is required is set per kind."
         },
-        "datetime": {
-          "$ref": "#/$defs/dateTime",
-          "description": "When the event happened. Always the best available event time: the source's own event time when it provides one, otherwise times.source_at, otherwise times.received_at. For spans, equals start_datetime."
-        },
-        "start_datetime": {
-          "$ref": "#/$defs/nullableDateTime"
-        },
-        "end_datetime": {
-          "$ref": "#/$defs/nullableDateTime"
-        },
-        "times": {
-          "$ref": "#/$defs/times"
-        },
-        "expires_at": {
-          "$ref": "#/$defs/nullableDateTime"
+        "temporal": {
+          "$ref": "#/$defs/temporal"
         },
         "geometry_source": {
           "description": "Where the geometry came from; null when geometry is null.",
@@ -440,32 +426,29 @@
           "type": "object",
           "description": "Type-specific content, validated against properties.schema."
         }
-      },
-      "allOf": [
-        {
-          "description": "An end time requires a start time. A start without an end is an open-ended span.",
-          "if": {
-            "required": [
-              "end_datetime"
-            ],
-            "properties": {
-              "end_datetime": {
-                "type": "string"
-              }
-            }
-          },
-          "then": {
-            "required": [
-              "start_datetime"
-            ],
-            "properties": {
-              "start_datetime": {
-                "type": "string"
-              }
-            }
-          }
+      }
+    },
+    "temporal": {
+      "type": "object",
+      "required": [
+        "datetime",
+        "times"
+      ],
+      "additionalProperties": false,
+      "description": "All time information for the record. datetime and end_datetime describe the real world: when it happened, or the period it applies to. times describes the pipeline: when the source produced it and when the Data Fabric received it. Whether a kind is an instant or a period is set in its type definition (time: instant | span).",
+      "properties": {
+        "datetime": {
+          "$ref": "#/$defs/dateTime",
+          "description": "When it happened. For a single moment (a detection, a track position, an operator action) this is that moment; for a period (a video segment, flight volume, zone) it is the start. Use the source's own event time when it provides one, otherwise times.source_at, otherwise times.received_at. Always set. OGC O&M: phenomenonTime for observations; start of validTime for defined things."
+        },
+        "end_datetime": {
+          "$ref": "#/$defs/nullableDateTime",
+          "description": "When the period ends. Only for kinds that are periods (time: span); always null for single moments. Null on a period means it has no end yet (e.g. a permanent zone). Must not be before datetime. OGC O&M: end of phenomenonTime or validTime."
+        },
+        "times": {
+          "$ref": "#/$defs/times"
         }
-      ]
+      }
     },
     "times": {
       "type": "object",
@@ -473,19 +456,15 @@
         "received_at"
       ],
       "additionalProperties": false,
-      "description": "Pipeline timestamps for latency analysis.",
+      "description": "When the data moved through the pipeline. Used to measure delay, never as the event time. Storage write times are kept by the database, not in the record.",
       "properties": {
         "source_at": {
-          "$ref": "#/$defs/nullableDateTime"
-        },
-        "sent_at": {
-          "$ref": "#/$defs/nullableDateTime"
+          "$ref": "#/$defs/nullableDateTime",
+          "description": "When the source produced the message, by its own clock. Can be later than datetime when the source reports an event after it happened. OGC O&M: resultTime."
         },
         "received_at": {
-          "$ref": "#/$defs/dateTime"
-        },
-        "stored_at": {
-          "$ref": "#/$defs/nullableDateTime"
+          "$ref": "#/$defs/dateTime",
+          "description": "When the Data Fabric first received the message. Always set. received_at minus datetime is the end-to-end delay."
         }
       }
     },

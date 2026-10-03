@@ -8,7 +8,7 @@ Exits 1 on any error. Suitable for CI.
 Checks, in order:
   1. Every *.schema.json is a valid JSON Schema; all are loaded into a local registry by $id.
   2. Each example passes the envelope schema and its payload schema.
-  3. Each example meets the normative cross-field rules (R1-R6, R10-R11) and its kind's type definition (R7-R9).
+  3. Each example meets the normative cross-field rules (R1, R3-R6, R10-R11) and its kind's type definition (R7-R9).
   4. No two examples share a deduplication key (source.id, kind, source.event_id).
 """
 import json, re, sys
@@ -82,13 +82,12 @@ def flat(geom):
     return {"type": geom["type"], "coordinates": walk(geom["coordinates"])}
 
 def normative_rules(rec, where):
-    """R1-R6, R10-R11: rules JSON Schema cannot express."""
+    """R1, R3-R6, R10-R11: rules JSON Schema cannot express."""
     p, g = rec["properties"], rec["geometry"]
-    # R1 span times ordered; R2 span datetime equals start
-    if p.get("start_datetime") and p.get("end_datetime") and ts(p["end_datetime"]) < ts(p["start_datetime"]):
-        errors.append(f"{where}: R1 end_datetime before start_datetime")
-    if p.get("start_datetime") and p["datetime"] != p["start_datetime"]:
-        errors.append(f"{where}: R2 datetime must equal start_datetime for spans")
+    t = p["temporal"]
+    # R1 a period does not end before it starts
+    if t.get("end_datetime") and ts(t["end_datetime"]) < ts(t["datetime"]):
+        errors.append(f"{where}: R1 end_datetime before datetime")
     # R3 vertical extent limits ordered; R11 a volume's footprint is 2D (heights only in vertical_extent)
     for shp, vext in volumes(g):
         if "lower" in vext and "upper" in vext and vext["lower"] > vext["upper"]:
@@ -118,10 +117,8 @@ def type_rules(rec, td, where):
     if p["kind"] != td["kind"] or p["schema"] != td["schema"]:
         errors.append(f"{where}: kind/schema do not match type definition")
     # R7 time type
-    if env["time"] == "instant" and (p.get("start_datetime") or p.get("end_datetime")):
-        errors.append(f"{where}: R7 instant kind has start/end_datetime")
-    if env["time"] == "span" and not p.get("start_datetime"):
-        errors.append(f"{where}: R7 span kind needs start_datetime")
+    if env["time"] == "instant" and p["temporal"].get("end_datetime"):
+        errors.append(f"{where}: R7 instant kind has end_datetime")
     # R8 presence rules
     zval = True if (g is not None and has_z(g)) else None
     for field, value in (("geometry", g), ("z", zval), ("vertical_extent", True if volumes(g) else None),("entity_id", p.get("entity_id"))):

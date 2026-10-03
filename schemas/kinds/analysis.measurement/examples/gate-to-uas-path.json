@@ -23,16 +23,14 @@
     "kind": "analysis.measurement",
     "schema": "urn:schema:analysis:measurement:v1",
     "entity_id": "urn:uuid:7b3e9a1c-4d2f-4e8a-9b6c-1f2e3d4c5b6a",
-    "datetime": "2026-09-23T18:06:10.000Z",
-    "start_datetime": null,
-    "end_datetime": null,
-    "times": {
-      "source_at": "2026-09-23T18:06:10.000Z",
-      "sent_at": "2026-09-23T18:06:10.015Z",
-      "received_at": "2026-09-23T18:06:10.030Z",
-      "stored_at": "2026-09-23T18:06:10.041Z"
+    "temporal": {
+      "datetime": "2026-09-23T18:06:10.000Z",
+      "end_datetime": null,
+      "times": {
+        "source_at": "2026-09-23T18:06:10.000Z",
+        "received_at": "2026-09-23T18:06:10.030Z"
+      }
     },
-    "expires_at": null,
     "geometry_source": "defined",
     "position_error_m": null,
     "domain": "LAND",

@@ -112,16 +112,14 @@
     "ume_version": "1",
     "kind": "track.raw",
     "schema": "urn:schema:tracks:raw-message:v1",
-    "datetime": "2026-09-23T17:46:01.100Z",
-    "start_datetime": null,
-    "end_datetime": null,
-    "times": {
-      "source_at": "2026-09-23T17:46:01.100Z",
-      "sent_at": "2026-09-23T17:46:01.115Z",
-      "received_at": "2026-09-23T17:46:01.130Z",
-      "stored_at": "2026-09-23T17:46:01.145Z"
+    "temporal": {
+      "datetime": "2026-09-23T17:46:01.100Z",
+      "end_datetime": null,
+      "times": {
+        "source_at": "2026-09-23T17:46:01.100Z",
+        "received_at": "2026-09-23T17:46:01.130Z"
+      }
     },
-    "expires_at": null,
     "geometry_source": "sensor_coverage",
     "position_error_m": null,
     "domain": "AIR",
