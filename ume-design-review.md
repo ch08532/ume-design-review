@@ -14,7 +14,7 @@ Review of the **Universal Metadata Envelope (UME) Design** against the Data Fabr
 8. [Proposed revised UME](#8-proposed-revised-ume)
 9. [Controlled lists and standards](#9-controlled-lists-and-standards)
 10. [Schema catalogue](#10-schema-catalogue)
-11. [Example use cases using the UME](#11-example-use-cases-using-the-ume)
+11. [Example UME use cases](#11-example-ume-use-cases)
 12. [Vertical model](#12-vertical-model)
 13. [Standards references](#13-standards-references)
 ---
