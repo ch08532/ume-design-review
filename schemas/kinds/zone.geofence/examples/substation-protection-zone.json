@@ -39,7 +39,6 @@
     "datetime": "2026-01-01T00:00:00.000Z",
     "start_datetime": "2026-01-01T00:00:00.000Z",
     "end_datetime": null,
-    "time_source": "event",
     "times": {
       "source_at": "2025-12-15T14:00:00.000Z",
       "sent_at": "2025-12-15T14:00:00.000Z",

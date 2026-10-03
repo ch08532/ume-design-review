@@ -16,7 +16,6 @@
     "datetime": "2026-09-23T18:07:00.000Z",
     "start_datetime": null,
     "end_datetime": null,
-    "time_source": "event",
     "times": {
       "source_at": "2026-09-23T18:07:00.000Z",
       "sent_at": "2026-09-23T18:07:00.014Z",

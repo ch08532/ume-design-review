@@ -372,24 +372,13 @@
         },
         "datetime": {
           "$ref": "#/$defs/dateTime",
-          "description": "When the event happened. For spans, equals start_datetime."
+          "description": "When the event happened. Always the best available event time: the source's own event time when it provides one, otherwise times.source_at, otherwise times.received_at. For spans, equals start_datetime."
         },
         "start_datetime": {
           "$ref": "#/$defs/nullableDateTime"
         },
         "end_datetime": {
           "$ref": "#/$defs/nullableDateTime"
-        },
-        "time_source": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "enum": [
-            "event",
-            "source_at",
-            null
-          ]
         },
         "times": {
           "$ref": "#/$defs/times"

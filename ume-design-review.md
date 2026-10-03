@@ -181,7 +181,7 @@ The processing times can then be grouped together under `times`:
 
 This keeps the difference clear:
 
-- `datetime` = when the event happened
+- `datetime` = when the event happened. It is always the best available event time: the source's own event time if it provides one, otherwise `source_at`, otherwise `received_at`.
 - `source_at` = when the source received or produced the data
 - `sent_at` = when the source sent it
 - `received_at` = when the platform received it
@@ -705,7 +705,6 @@ This example shows how a fused track from a sensor, such as ADS-B, could be repr
     "datetime": "2026-09-23T17:46:01.200Z",
     "start_datetime": null,
     "end_datetime": null,
-    "time_source": "event",
     "times": {
       "source_at": "2026-09-23T17:46:01.205Z",
       "sent_at": "2026-09-23T17:46:01.210Z",
@@ -840,7 +839,6 @@ Most of the basic UME envelope uses existing standards for geometry, time, ident
 | `entity_id` | `urn:track:...` | ◐ | Uses standard URN format, but the namespace is UME-specific |
 | `source.id` | `urn:source:...` | ◐ | Uses standard URN format, but the namespace is UME-specific |
 | `source.event_id` | Depends on the source | ◐ | Usually built from identifiers already provided by the source system |
-| `time_source` | `event`, `source_at` | ✖ | UME |
 | `geometry_source` | `observed`, `defined`, `sensor_coverage`, `sensor`, `aoi` | ✖ | UME |
 | `domain` | AIR, LAND, SEA_SURFACE, SUBSURFACE, SPACE | ◐ | Based on common military domain concepts |
 | `position_error_m` | Position error in metres | ◐ | Uses standard SI units; UME defines the exact meaning |
@@ -884,7 +882,7 @@ UME should also use standard link names, media types, and file metadata where po
 
 The goal is not to make every field come from an external standard.
 
-Fields such as `kind`, `time_source`, and `geometry_source` are specific to UME and that is fine. The important thing is to use existing standards where they fit and clearly document the fields that UME defines itself.
+Fields such as `kind` and `geometry_source` are specific to UME and that is fine. The important thing is to use existing standards where they fit and clearly document the fields that UME defines itself.
 
 ### 9.4 Identifier conventions
 
