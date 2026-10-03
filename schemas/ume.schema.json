@@ -341,7 +341,7 @@
         "kind",
         "schema",
         "temporal",
-        "geometry_source",
+        "spatial",
         "source",
         "provenance",
         "security",
@@ -372,28 +372,15 @@
         "temporal": {
           "$ref": "#/$defs/temporal"
         },
-        "geometry_source": {
-          "description": "Where the geometry came from; null when geometry is null.",
-          "type": [
-            "string",
-            "null"
-          ],
-          "enum": [
-            "observed",
-            "defined",
-            "sensor_coverage",
-            "sensor",
-            "aoi",
-            null
+        "spatial": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/spatial"
+            },
+            {
+              "type": "null"
+            }
           ]
-        },
-        "position_error_m": {
-          "type": [
-            "number",
-            "null"
-          ],
-          "minimum": 0,
-          "description": "Horizontal 95% position error radius, metres."
         },
         "domain": {
           "type": [
@@ -408,10 +395,6 @@
             "SPACE",
             null
           ]
-        },
-        "vertical_approximate": {
-          "type": "boolean",
-          "description": "True when heights (z or a geometry's vertical_extent) were converted using assumptions, e.g. flight levels via the standard atmosphere."
         },
         "source": {
           "$ref": "#/$defs/source"
@@ -465,6 +448,43 @@
         "received_at": {
           "$ref": "#/$defs/dateTime",
           "description": "When the Data Fabric first received the message. Always set. received_at minus datetime is the end-to-end delay."
+        }
+      }
+    },
+    "spatial": {
+      "type": "object",
+      "required": [
+        "geometry_source"
+      ],
+      "additionalProperties": false,
+      "description": "Describes the record's geometry: where it came from and how accurate it is. Null exactly when geometry is null (validator rule R4).",
+      "properties": {
+        "geometry_source": {
+          "description": "Where the geometry came from: observed (measured position), defined (drawn or published shape), sensor_coverage (a sensor's coverage area), sensor (the sensor's own position), aoi (an area of interest).",
+          "type": "string",
+          "enum": [
+            "observed",
+            "defined",
+            "sensor_coverage",
+            "sensor",
+            "aoi"
+          ]
+        },
+        "position_error_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Horizontal accuracy, metres: 95% of the time the true position is within this distance of the geometry. For a point, the position error; for a line or polygon, how far any part of the shape may be from its true position. Null when unknown or for defined shapes."
+        },
+        "vertical_error_m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Vertical accuracy, metres (95%) of the heights: geometry z, or the vertical_extent limits of a volume. Includes any conversion error, e.g. a flight level converted using the standard atmosphere, or an AGL height converted with a terrain model. Null when unknown, when the geometry has no heights, or for defined heights that needed no conversion."
         }
       }
     },

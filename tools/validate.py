@@ -8,7 +8,7 @@ Exits 1 on any error. Suitable for CI.
 Checks, in order:
   1. Every *.schema.json is a valid JSON Schema; all are loaded into a local registry by $id.
   2. Each example passes the envelope schema and its payload schema.
-  3. Each example meets the normative cross-field rules (R1, R3-R6, R10-R11) and its kind's type definition (R7-R9).
+  3. Each example meets the normative cross-field rules (R1, R3-R6, R10-R12) and its kind's type definition (R7-R9).
   4. No two examples share a deduplication key (source.id, kind, source.event_id).
 """
 import json, re, sys
@@ -82,7 +82,7 @@ def flat(geom):
     return {"type": geom["type"], "coordinates": walk(geom["coordinates"])}
 
 def normative_rules(rec, where):
-    """R1, R3-R6, R10-R11: rules JSON Schema cannot express."""
+    """R1, R3-R6, R10-R12: rules JSON Schema cannot express."""
     p, g = rec["properties"], rec["geometry"]
     t = p["temporal"]
     # R1 a period does not end before it starts
@@ -94,9 +94,12 @@ def normative_rules(rec, where):
             errors.append(f"{where}: R3 vertical_extent lower > upper")
         if has_z(shp):
             errors.append(f"{where}: R11 {shp['type']} with vertical_extent must have 2D coordinates")
-    # R4 geometry and geometry_source go together
-    if (g is None) != (p["geometry_source"] is None):
-        errors.append(f"{where}: R4 geometry and geometry_source must both be null or both set")
+    # R4 spatial describes the geometry: both null or both set
+    if (g is None) != (p["spatial"] is None):
+        errors.append(f"{where}: R4 geometry and spatial must both be null or both set")
+    # R12 a vertical error needs heights to apply to (z or a vertical_extent)
+    if p["spatial"] and p["spatial"].get("vertical_error_m") is not None and not (has_z(g) or volumes(g)):
+        errors.append(f"{where}: R12 vertical_error_m set but the geometry has no heights")
     if g is not None:
         # R5 rings closed
         for r in rings(g):
@@ -127,8 +130,8 @@ def type_rules(rec, td, where):
             errors.append(f"{where}: R8 {field} required for this kind")
         if rule == "not_allowed" and value is not None:
             errors.append(f"{where}: R8 {field} not allowed for this kind")
-    if g is not None and p["geometry_source"] not in env["geometry_source"]:
-        errors.append(f"{where}: R8 geometry_source {p['geometry_source']} not allowed")
+    if g is not None and p["spatial"] and p["spatial"]["geometry_source"] not in env["geometry_source"]:
+        errors.append(f"{where}: R8 geometry_source {p['spatial']['geometry_source']} not allowed")
     roles = {r for a in rec.get("assets", {}).values() for r in a.get("roles", [])}
     for r in env.get("required_assets", []):
         if r not in roles:

@@ -45,8 +45,11 @@
         "received_at": "2026-09-23T17:48:31.400Z"
       }
     },
-    "geometry_source": "observed",
-    "position_error_m": 1.5,
+    "spatial": {
+      "geometry_source": "observed",
+      "position_error_m": 1.5,
+      "vertical_error_m": 3.0
+    },
     "domain": "LAND",
     "source": {
       "id": "urn:source:skydio-x2-0402",

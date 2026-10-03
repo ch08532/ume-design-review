@@ -15,8 +15,7 @@
         "received_at": "2026-09-23T18:05:30.030Z"
       }
     },
-    "geometry_source": null,
-    "position_error_m": null,
+    "spatial": null,
     "domain": null,
     "source": {
       "id": "urn:source:console-03",

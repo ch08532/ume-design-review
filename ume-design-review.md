@@ -218,32 +218,36 @@ The current UME design already supports GeoJSON geometry and different coordinat
 |---|---|---|
 | **S1** | Height can be interpreted differently depending on the CRS and `altitude_type`. A client may need to check several fields before it knows what the third coordinate means. | Use one consistent vertical model. Store 3D positions as longitude, latitude, and WGS-84 ellipsoidal height. Keep source-specific values such as pressure altitude in the payload. Represent volumes as a 2D polygon footprint whose geometry carries a `vertical_extent` with lower and upper height limits. |
 | **S2** | The design allows `spatial` to be `null`, but it does not clearly define which data types require geometry and which do not. | Define the geometry rules for each `kind`: `required`, `optional`, or `not_allowed`. This avoids adding made-up locations to records that do not have a meaningful position. |
-| **S3** | Raw sensor data may not yet contain a known target position. Using a target point before the message is parsed could make spatial queries misleading. | If the target position is unknown, use the sensor location or sensor coverage area when useful, and clearly identify where the geometry came from with `geometry_source`. |
-| **S4** | `confidence` is a value from `0.0` to `1.0`, but the design does not define exactly what that number means. | Use a clearly defined field such as `position_error_m` for position accuracy. If other confidence values are needed, keep them in the payload and define their meaning in the payload schema. |
+| **S3** | Raw sensor data may not yet contain a known target position. Using a target point before the message is parsed could make spatial queries misleading. | If the target position is unknown, use the sensor location or sensor coverage area when useful, and clearly identify where the geometry came from with `spatial.geometry_source`. |
+| **S4** | `confidence` is a value from `0.0` to `1.0`, but the design does not define exactly what that number means. | Use clearly defined accuracy fields, `spatial.position_error_m` and `spatial.vertical_error_m`, in metres at 95%. If other confidence values are needed, keep them in the payload and define their meaning in the payload schema. |
 | **S5** | `domain` mixes physical operating areas such as `AIR`, `LAND`, and `SPACE` with categories such as `CYBER`, `ENVIRONMENTAL`, and `LOGISTICS`. | Decide what `domain` is intended to represent and keep the list consistent. If it represents physical operating domains, keep other categories in the payload or another field. |
 | **S6** | Fields such as `horizontal_speed`, `vertical_speed`, and `bearing` do not clearly state their units or reference. | Include units and meaning in the field names, for example `ground_speed_mps`, `vertical_rate_mps`, `course_deg`, or `heading_deg`. |
 | **S7** | `track_id` is an integer, but the design does not define whether it must be unique across all nodes or only within one source or site. | Namespace track IDs so they remain unique when data from different nodes is combined, for example `site-a:9421`. |
 | **S8** | GeoJSON Polygon can describe an area or surface, but it does not directly describe an airspace volume with both a lower and upper height. | For volumetric data such as UTM volumes, NOTAMs, and geofences, store the 2D footprint once as the `geometry` polygon and add the height limits to it as `vertical_extent` (`lower`, `upper`). This keeps one shape per record, with its heights attached. A JSON-FG Prism can be derived from these at the API edge if a client needs one. |
 
-For geometry, I would also add a small `geometry_source` field so clients know where the location came from.
-
-For example:
+The geometry itself stays at the top of the record (`geometry` and `coordRefSys`). Information *about* the geometry goes in one `spatial` section, in the same way that `temporal` holds the time fields:
 
 ```json
-"geometry_source": "observed"
+"spatial": {
+  "geometry_source": "observed",
+  "position_error_m": 12.0,
+  "vertical_error_m": 15.0
+}
 ```
 
-Possible values could include:
+| Field | What it means | Example (fused track) |
+|---|---|---|
+| `geometry_source` | **Where the geometry came from.** `observed` means the position came from the data. `defined` means the shape was drawn or published, such as a zone or UTM volume. `sensor_coverage` means it's a sensor's coverage area. `sensor` means it's the sensor's own location. `aoi` means it's a mission area of interest. Always set. | `observed` |
+| `position_error_m` | **How accurate it is horizontally.** A 95% error radius in metres: 95% of the time, the true position is within this distance. For a line or polygon, it is how far any part of the shape may be from its true position. Null when unknown, or for defined shapes. | 12 m |
+| `vertical_error_m` | **How accurate the heights are.** A 95% error in metres for the heights: geometry z, or a volume's `vertical_extent` limits. It includes any conversion error, for example a flight level converted using the standard atmosphere, or an AGL height converted with a terrain model (see 12). Null when unknown, when there are no heights, or for defined heights that needed no conversion. | 15 m |
 
-- `observed` — the position came directly from the data
-- `defined` — the area was explicitly defined, such as a zone or UTM volume
-- `sensor_coverage` — the geometry represents the sensor coverage area
-- `sensor` — the geometry is the sensor location
-- `aoi` — the geometry is a mission area of interest
+**Rules:**
 
-This makes it clear whether the geometry represents the actual object position, a defined area, or a sensor's location or coverage.
+- **`spatial` is null exactly when `geometry` is null.** There is deliberately no fallback to the processing node's location. A record with no meaningful location has `geometry: null` and `spatial: null`.
+- **`vertical_error_m` is only set when the geometry has heights.** Geometry has heights when it has z values or a `vertical_extent`.
+- **Defined shapes**, such as zones, NOTAMs, volumes and analysis results, have no measurement error. Their `position_error_m` is null, and so is `vertical_error_m` unless their heights were converted.
 
-There is deliberately no fallback to the processing node's location. A record with no meaningful location should have `geometry: null` (and `geometry_source: null`).
+These fields let any record be filtered or weighted by location quality without knowing its kind. Source-specific accuracy details, such as ADS-B NACp or a radar covariance, stay in the payload.
 
 ### 6.3 Links
 
@@ -734,8 +738,11 @@ This example shows how a fused track from a sensor, such as ADS-B, could be repr
         "received_at": "2026-09-23T17:46:01.215Z"
       }
     },
-    "geometry_source": "observed",
-    "position_error_m": 12.0,
+    "spatial": {
+      "geometry_source": "observed",
+      "position_error_m": 12.0,
+      "vertical_error_m": 15.0
+    },
     "domain": "AIR",
     "source": {
       "id": "urn:source:omnitrack-01",
@@ -810,7 +817,7 @@ The table below shows how fields in the current UME design would map to the prop
 | `spatial.geometry` | Moves to the top-level `geometry` field. It can be 2D or 3D, or `null` when the `kind` allows it. |
 | Geometry height / `altitude_type` | Height is stored as the third geometry coordinate for points and lines. Volumes use a 2D polygon footprint with a `vertical_extent` on the geometry. Original altitude values can still be kept in the payload. |
 | `spatial.crs` | Replaced by the required `coordRefSys` field. Currently the only allowed value is OGC CRS84h, meaning longitude, latitude, and WGS-84 ellipsoidal height. |
-| `spatial.confidence` | Replaced by `position_error_m` and `geometry_source`. |
+| `spatial.confidence` | Replaced by `spatial.position_error_m`, `spatial.vertical_error_m` and `spatial.geometry_source`. |
 | `spatial.domain` | Becomes `domain`, used only for physical domains such as `AIR`, `LAND`, `SEA_SURFACE`, `SUBSURFACE`, or `SPACE`. |
 | `spatial.track.*` | Track-specific fields move into `payload`, based on the schema for that `kind`. |
 | `spatial.track.payload` raw binary data | Raw data stays on the messaging backbone or is stored as a file asset using a `track.raw` record. |
@@ -852,7 +859,6 @@ Most of the basic UME envelope uses existing standards for geometry, time, ident
 | Coordinates | longitude, latitude, optional height | ✅ | GeoJSON / OGC |
 | `coordRefSys` | `http://www.opengis.net/def/crs/OGC/0/CRS84h` | ✅ | OGC CRS URI (as used by JSON-FG / OGC API – Features) |
 | `geometry.vertical_extent` | `{ "lower": 45.0, "upper": 165.0 }` on a Polygon / MultiPolygon (metres, in the `coordRefSys` vertical reference) | ◐ | Same lower/upper model as a JSON-FG Prism, without repeating the footprint |
-| `vertical_approximate` | `true` / `false` | ✖ | UME |
 | `id` | `urn:uuid:<UUIDv7>` | ✅ | UUID / URN standards |
 | Date and time | `2026-09-23T17:46:01.200Z` | ✅ | RFC 3339 |
 | `ume_version` | `1` | ✖ | UME |
@@ -861,9 +867,9 @@ Most of the basic UME envelope uses existing standards for geometry, time, ident
 | `entity_id` | `urn:track:...` | ◐ | Uses standard URN format, but the namespace is UME-specific |
 | `source.id` | `urn:source:...` | ◐ | Uses standard URN format, but the namespace is UME-specific |
 | `source.event_id` | Depends on the source | ◐ | Usually built from identifiers already provided by the source system |
-| `geometry_source` | `observed`, `defined`, `sensor_coverage`, `sensor`, `aoi` | ✖ | UME |
+| `spatial.geometry_source` | `observed`, `defined`, `sensor_coverage`, `sensor`, `aoi` | ✖ | UME |
 | `domain` | AIR, LAND, SEA_SURFACE, SUBSURFACE, SPACE | ◐ | Based on common military domain concepts |
-| `position_error_m` | Position error in metres | ◐ | Uses standard SI units; UME defines the exact meaning |
+| `spatial.position_error_m` / `spatial.vertical_error_m` | Horizontal / vertical error in metres (95%) | ◐ | Uses standard SI units and a 95% confidence level; UME defines the exact meaning |
 | `provenance.creator` | `urn:user:...` or `null` | ◐ | Dublin Core `creator` / W3C PROV attribution; the URN namespace is UME-specific |
 
 The main idea is that UME does not invent new formats for things like location, time, and identifiers when a suitable standard already exists.
@@ -904,7 +910,7 @@ UME should also use standard link names, media types, and file metadata where po
 
 The goal is not to make every field come from an external standard.
 
-Fields such as `kind` and `geometry_source` are specific to UME and that is fine. The important thing is to use existing standards where they fit and clearly document the fields that UME defines itself.
+Fields such as `kind` and `spatial.geometry_source` are specific to UME and that is fine. The important thing is to use existing standards where they fit and clearly document the fields that UME defines itself.
 
 ### 9.4 Identifier conventions
 
@@ -1367,7 +1373,7 @@ AGL is not a CRS, because it depends on the terrain at each point. Heights are t
 
 - **Points:** z = terrain height above the ellipsoid (from a DEM and geoid model) + the AGL value.
 - **Volumes:** for a terrain-following limit such as "SFC to 400 ft AGL", `vertical_extent` holds a conservative box that contains the real volume: `lower` = minimum terrain under the footprint + the lower limit, and `upper` = maximum terrain + the upper limit.
-- **In both cases** the source value is kept in the payload (`altitude` with `reference: "AGL"` or `"SFC"`), and `vertical_approximate` is set to `true`. Exact terrain-following checks use the payload values and a DEM. The envelope is used for fast filtering.
+- **In both cases** the source value is kept in the payload (`altitude` with `reference: "AGL"` or `"SFC"`), and `spatial.vertical_error_m` includes the conversion error, such as the terrain model's accuracy. Exact terrain-following checks use the payload values and a DEM. The envelope is used for fast filtering.
 
 This keeps every z value comparable across records, so no query needs a terrain lookup.
 

@@ -44,8 +44,11 @@
         "received_at": "2025-12-15T14:00:01.020Z"
       }
     },
-    "geometry_source": "defined",
-    "position_error_m": null,
+    "spatial": {
+      "geometry_source": "defined",
+      "position_error_m": null,
+      "vertical_error_m": 10.0
+    },
     "domain": "AIR",
     "source": {
       "id": "urn:source:zone-registry",
