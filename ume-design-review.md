@@ -1063,7 +1063,8 @@ track.raw ────────┐
 sensor.detection ─┘
 
 zone.geofence ─► alert.zone_breach ─► alert.state_change
-                        └────────────► track.command
+                        ├────────────► track.command
+                        └────────────► analysis.measurement
 
 utm.volume ─┬─► alert.nonconformance
             └── utm.intent_state
@@ -1230,8 +1231,11 @@ zone.geofence
                               ├──► alert.state_change
                               │       acknowledged
                               │
-                              └──► track.command
-                                      reclassify
+                              ├──► track.command
+                              │       reclassify
+                              │
+                              └──► analysis.measurement
+                                      gate-to-UAS distance
 ```
 
 Each record has a different purpose:
@@ -1253,6 +1257,18 @@ The status record can contain:
 - its `entity_id`
 
 All status updates for the same sensor use the same `entity_id`. This allows the platform to show the latest sensor status while still keeping the previous status records.
+
+### 11.6 Map measurement
+
+`analysis.measurement/examples/gate-to-uas-path.json` continues the Substation B event. An operator uses the map's measurement tool to measure the route from the south gate, along the access road, to the UAS position. It is an example of a record that a person creates.
+
+| Concept | How it is represented |
+|---|---|
+| Measured line | `geometry` is a LineString through the measured points. It can be 3D if heights were measured. |
+| Results | The total length (457.9 m), the length of each segment, and the initial bearing stay in the payload, along with `method` (`GEODESIC`, `RHUMB_LINE` or `SLANT_3D`). |
+| Who and where | `source.id` is the operator console that generated the record, and `provenance.creator` is the operator who made the measurement. |
+| Related records | `derived_from` points to the zone-breach alert the operator was working from. `payload.references` lists the track and zone that were measured. |
+| Edits | Each edit is a new record with the same `entity_id` and a `revision_of` pointing to the previous version. |
 
 ## 12. Vertical model
 
