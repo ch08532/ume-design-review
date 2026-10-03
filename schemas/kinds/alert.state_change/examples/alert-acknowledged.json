@@ -33,6 +33,7 @@
       "produced_by": "operator-console",
       "producer_version": "2.3.1",
       "producer_org": "urn:org:northgrid-utility",
+      "creator": "urn:user:northgrid:op-117",
       "config_hash": null
     },
     "security": {
@@ -50,7 +51,6 @@
     "payload": {
       "status": "ACKNOWLEDGED",
       "previous_status": "ACTIVE",
-      "actor": "urn:user:northgrid:op-117",
       "note": "Investigating; camera tasked"
     }
   },

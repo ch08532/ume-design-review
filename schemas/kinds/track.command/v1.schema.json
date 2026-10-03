@@ -6,8 +6,7 @@
   "type": "object",
   "required": [
     "command",
-    "target_track_ids",
-    "operator"
+    "target_track_ids"
   ],
   "additionalProperties": false,
   "properties": {
@@ -41,10 +40,6 @@
         "type": "string"
       },
       "uniqueItems": true
-    },
-    "operator": {
-      "$ref": "urn:schema:fabric:common:v1#/$defs/user_urn",
-      "x-personal-info": true
     },
     "reason": {
       "type": "string"

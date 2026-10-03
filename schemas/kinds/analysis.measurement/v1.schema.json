@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:schema:analysis:measurement:v1",
+  "title": "Payload: map measurement v1",
+  "description": "A distance or path measured with a map measurement tool. The measured line is the envelope geometry (a LineString, 3D when heights were measured). Edits to the measurement are new records with revision_of.",
+  "type": "object",
+  "required": [
+    "measurement_id",
+    "edit_sequence",
+    "measurement_type",
+    "method",
+    "total_length_m"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "measurement_id": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/uuid"
+    },
+    "edit_sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Increments each time the operator edits the measurement"
+    },
+    "measurement_type": {
+      "enum": [
+        "DISTANCE",
+        "PATH"
+      ],
+      "description": "DISTANCE = two points; PATH = length along three or more points"
+    },
+    "method": {
+      "enum": [
+        "GEODESIC",
+        "RHUMB_LINE",
+        "SLANT_3D"
+      ],
+      "description": "How lengths were computed on the WGS-84 ellipsoid; SLANT_3D includes height differences"
+    },
+    "total_length_m": {
+      "type": "number",
+      "minimum": 0
+    },
+    "segment_lengths_m": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0
+      },
+      "description": "One length per segment, in geometry order"
+    },
+    "initial_bearing_deg": {
+      "$ref": "urn:schema:fabric:common:v1#/$defs/angle_deg",
+      "description": "Bearing of the first segment at its start point"
+    },
+    "label": {
+      "type": "string"
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:schema:fabric:common:v1#/$defs/entity_urn"
+      },
+      "uniqueItems": true,
+      "description": "Entities the measurement was taken to or from, e.g. a track or zone"
+    }
+  }
+}

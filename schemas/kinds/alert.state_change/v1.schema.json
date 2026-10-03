@@ -5,8 +5,7 @@
   "description": "A change in an alert's state. entity_id is the alert's entity_id. The original alert record is never edited.",
   "type": "object",
   "required": [
-    "status",
-    "actor"
+    "status"
   ],
   "additionalProperties": false,
   "properties": {
@@ -24,10 +23,6 @@
         "ACKNOWLEDGED",
         "ESCALATED"
       ]
-    },
-    "actor": {
-      "$ref": "urn:schema:fabric:common:v1#/$defs/user_urn",
-      "x-personal-info": true
     },
     "note": {
       "type": "string"
