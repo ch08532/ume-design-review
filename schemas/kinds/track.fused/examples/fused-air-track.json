@@ -34,7 +34,7 @@
       "event_id": "site-a:9421:118734"
     },
     "provenance": {
-      "origin": "urn:source:flightline-0037",
+      "origin": "urn:source:pingstation3-0037",
       "derived_from": [
         "urn:uuid:01926f3a-7d01-7bb2-b841-39659b8120e5",
         "urn:uuid:01926f3a-7d02-78b2-b1d6-857c0e66c91a"

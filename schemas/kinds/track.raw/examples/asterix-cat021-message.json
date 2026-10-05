@@ -127,15 +127,15 @@
     },
     "domain": "AIR",
     "source": {
-      "id": "urn:source:flightline-0037",
+      "id": "urn:source:pingstation3-0037",
       "node": "site-a",
       "event_id": "012/037:C0FFEE:8187021"
     },
     "provenance": {
-      "origin": "urn:source:flightline-0037",
+      "origin": "urn:source:pingstation3-0037",
       "derived_from": [],
       "revision_of": null,
-      "produced_by": "flightline-adapter",
+      "produced_by": "pingstation-adapter",
       "producer_version": "1.2.0",
       "producer_org": "urn:org:dnd",
       "config_hash": null
@@ -166,9 +166,9 @@
   "links": [],
   "assets": {
     "data": {
-      "href": "s3://mission-lake/raw/flightline-0037/2026/09/23/1746.bin",
+      "href": "s3://mission-lake/raw/pingstation3-0037/2026/09/23/1746.bin",
       "type": "application/octet-stream",
-      "title": "Raw message batch (one minute)",
+      "title": "Raw ASTERIX CAT021 recording (one minute)",
       "roles": [
         "data"
       ],

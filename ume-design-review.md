@@ -326,7 +326,7 @@ The main recommendation is to separate **information about the UME record** from
 | **A2** | The current design does not clearly separate what the data represents, the schema that describes it, and the format of a file. | Use `kind` to describe what the record represents, `schema` to describe the payload structure, and asset `type` to describe the file format. |
 | **A3** | `lifecycle` mixes different ideas. `RAW` describes what the data is, while `PROCESSING` and `AVAILABLE` describe its current state. | Use `kind` or the payload to describe the type of data. Keep temporary processing state separate from the historical UME record. |
 | **A4** | `lifecycle` and `storage_tier` can change after the UME is written. | Keep changing state outside the UME record, for example in a separate `ume_state` table or storage-management service. |
-| **A5** | `source_id` is an integer, but the design does not define whether it is unique across all sites and nodes. | Use a stable identifier per device or producing service, such as `urn:source:flightline-0037`, and record the ingesting node separately in `source.node`. Keeping the site out of the source ID means a sensor that moves between sites keeps the same identity. |
+| **A5** | `source_id` is an integer, but the design does not define whether it is unique across all sites and nodes. | Use a stable identifier per device or producing service, such as `urn:source:pingstation3-0037`, and record the ingesting node separately in `source.node`. Keeping the site out of the source ID means a sensor that moves between sites keeps the same identity. |
 | **A6** | `sha256` is included, but it is not clear exactly what data is being hashed. | Define the checksum as the hash of the exact asset bytes so every service calculates it the same way. Store it as a SHA-256 multihash (`1220` followed by 64 hex characters), the format the STAC File extension uses for `file:checksum`. `config_hash` uses the same format. |
 | **A7** | Some checksum values in the examples appear to be placeholders. | Use real or clearly marked example checksum values and validate them as part of the test examples. |
 | **A8** | The relationship between the UME ID and asset UUID is not clearly defined. | Only give an asset its own ID when it needs a separate identity, such as when several UME records reference the same file. |
@@ -350,7 +350,7 @@ A simple provenance structure could look like:
 
 ```json
 "provenance": {
-  "origin": "urn:source:flightline-0037",
+  "origin": "urn:source:pingstation3-0037",
   "derived_from": [
     "urn:uuid:01926f3a-7d01-7bb2-b841-39659b8120e5"
   ],
@@ -365,7 +365,7 @@ A simple provenance structure could look like:
 
 | Field | Required | Meaning |
 |---|---|---|
-| `origin` | Yes | The sensor or service the data first came from, as a quick way to see it without following `derived_from`. For first-hand records, it is the same as `source.id`. For derived records, it is the main input source: here the tracker (`source.id`) built the record from flightline sensor data (`origin`). When several sources contributed equally, the producer chooses the main one, and `derived_from` holds the full list. `origin` is always a system, never a person (see `creator`). |
+| `origin` | Yes | The sensor or service the data first came from, as a quick way to see it without following `derived_from`. For first-hand records, it is the same as `source.id`. For derived records, it is the main input source: here the tracker (`source.id`) built the record from pingStation 3 ADS-B receiver data (`origin`). When several sources contributed equally, the producer chooses the main one, and `derived_from` holds the full list. `origin` is always a system, never a person (see `creator`). |
 | `derived_from` | Yes (may be empty) | The records that were used to create this one. |
 | `revision_of` | No | The earlier record that this one corrects or replaces. |
 | `produced_by` | Yes | The software or service that created the record. |
@@ -750,7 +750,7 @@ This example shows how a fused track from a sensor, such as ADS-B, could be repr
       "event_id": "site-a:9421:118734"
     },
     "provenance": {
-      "origin": "urn:source:flightline-0037",
+      "origin": "urn:source:pingstation3-0037",
       "derived_from": [
         "urn:uuid:01926f3a-7d01-7bb2-b841-39659b8120e5",
         "urn:uuid:01926f3a-7d02-78b2-b1d6-857c0e66c91a"
@@ -1051,18 +1051,18 @@ These are only example `kind` values, created to show how UME could work with di
 
 | Kind | What it represents | Time | Location / shape | Height | Linked entity | Files |
 |---|---|---|---|---|---|---|
-| `track.raw` | One raw message from a sensor | Single point in time | Sensor coverage area (Polygon) | — | — | Batch file |
+| `track.raw` | One raw message from a sensor | Single point in time | Sensor coverage area (Polygon) | — | — | Binary recording of the raw sensor data (for example ASTERIX), required, usually one file per time period. The record points to where its message sits in the file, using a byte offset and length. |
 | `sensor.detection` | One detection from a sensor before tracks are combined | Single point in time | Estimated position (Point) | Optional | Optional | — |
 | `track.fused` | The latest state of a fused track | Single point in time | Track position (Point) | Optional | Track | — |
 | `track.command` | An operator action applied to a track | Single point in time | Optional (Point) | — | Target track, if needed | — |
 | `alert.zone_breach` | An alert when a track enters, leaves, or stays too long in a zone | Single point in time | Where the breach happened (Point) | Optional | Alert | — |
 | `alert.nonconformance` | An alert when a track leaves its planned UTM volume | Single point in time | Track position (Point) | Optional | Alert | — |
 | `alert.state_change` | A change to an alert, such as acknowledged, escalated, resolved, or dismissed | Single point in time | None | — | Alert | — |
-| `video.segment` | A section of full-motion video | Time period | Area shown by the video (Polygon) | Optional | — | Video, HLS, thumbnail, KLV |
-| `imagery.ortho` | An orthorectified image | Time period | Image footprint (Polygon) | Optional | — | COG, thumbnail |
+| `video.segment` | A section of full-motion video | Time period | Area shown by the video (Polygon) | Optional | — | The original video segment with its embedded KLV metadata (MPEG-TS, STANAG 4609), required. Optionally an HLS rendition for playback in a browser, a thumbnail image, and the KLV metadata decoded to JSON. |
+| `imagery.ortho` | An orthorectified image | Time period | Image footprint (Polygon) | Optional | — | The orthorectified image as a Cloud Optimized GeoTIFF (COG), required, so clients can read just the area and resolution they need. Optionally a thumbnail image for previews. |
 | `utm.volume` | One 4D airspace volume for an operational intent | Time period | 2D footprint (Polygon / MultiPolygon) | Lower and upper limits | Operational intent | — |
 | `utm.intent_state` | A change in the state of an operational intent | Single point in time | Optional | — | Operational intent | — |
-| `aim.notam` | A NOTAM that applies to an area | Time period | Restricted area (Polygon / MultiPolygon) | Lower and upper limits | NOTAM | AIXM, text |
+| `aim.notam` | A NOTAM that applies to an area | Time period | Restricted area (Polygon / MultiPolygon) | Lower and upper limits | NOTAM | The original NOTAM as AIXM 5.1 Digital NOTAM XML, required. Optionally the original ICAO-format text, as pilots and operators read it. |
 | `zone.geofence` | A protected, restricted, or monitored area | Time period, optionally no end time | Zone area (Polygon / MultiPolygon) | Lower and upper limits | Zone | — |
 | `sensor.status` | Sensor health, status, and coverage | Single point in time | Sensor coverage area (Polygon) | Optional | Sensor | — |
 | `analysis.measurement` | A distance or path measured with a map measurement tool | Single point in time | Measured line (LineString) | Optional | Measurement | — |
