@@ -1427,6 +1427,13 @@ This keeps every z value comparable across records, so no query needs a terrain 
 
 The following standards and specifications are referenced in this review. These links are provided as a convenient starting point for further reading.
 
+They are split into two groups:
+
+- **Core standards (12.1)** are used by the UME itself: the envelope, the schema catalogue, security labels, and messaging. Every record and every `kind` depends on them.
+- **Standards used by the example kinds (12.2)** are used only by the payloads and files of the example kinds in 9.4 and 10. The kinds are illustrations, so these standards are not requirements of the UME. They show how source data in existing formats fits into it.
+
+### 12.1 Core standards
+
 | Standard / specification | Used for | Reference |
 |---|---|---|
 | **GeoJSON – RFC 7946** | Geometry objects and coordinate structure; model for the `id` / `geometry` / `properties` record layout | [RFC 7946 – GeoJSON](https://www.rfc-editor.org/info/rfc7946/) |
@@ -1437,15 +1444,33 @@ The following standards and specifications are referenced in this review. These 
 | **RFC 3339** | Date and time format used by UME timestamps | [RFC 3339 – Date and Time on the Internet](https://www.rfc-editor.org/info/rfc3339/) |
 | **RFC 8141** | URN syntax used for stable identifiers such as `urn:source:...` and `urn:org:...` | [RFC 8141 – Uniform Resource Names](https://www.rfc-editor.org/info/rfc8141/) |
 | **RFC 9562** | UUIDs, including UUIDv7 used for UME record IDs | [RFC 9562 – UUIDs](https://www.rfc-editor.org/info/rfc9562/) |
+| **JSON Schema 2020-12** | Language for the envelope schema and every payload schema in the catalogue | [JSON Schema 2020-12](https://json-schema.org/draft/2020-12) |
 | **ISO 3166-1** | Standard country codes such as `CAN`, `USA`, `GBR`, `AUS`, and `NZL` | [ISO 3166-1 Country Codes](https://www.iso.org/standard/72482.html) |
 | **IANA Link Relations** | Standard values for link relationships such as `self`, `related`, `alternate`, `next`, and `prev` | [IANA Link Relations Registry](https://www.iana.org/assignments/link-relations) |
+| **RFC 8288 – Web Linking** | Model for stored `links` (`rel`, `href`, `type`) | [RFC 8288 – Web Linking](https://www.rfc-editor.org/info/rfc8288/) |
 | **IANA Media Types** | Standard media types used by links and assets, such as `image/jpeg` and `video/mp2t` | [IANA Media Types Registry](https://www.iana.org/assignments/media-types) |
 | **STAC** | Asset, link, imagery, and spatiotemporal metadata patterns | [STAC Specification](https://github.com/radiantearth/stac-spec) |
 | **STAC File Info Extension** | Fields such as `file:size` and `file:checksum` | [STAC File Info Extension](https://github.com/stac-extensions/file) |
 | **FIPS 180-4 – Secure Hash Standard** | SHA-256 checksums used for file integrity | [NIST FIPS 180-4](https://csrc.nist.gov/pubs/fips/180-4/upd1/final) |
+| **Multihash (Multiformats)** | Self-describing hash format (`1220` + SHA-256) used by `file:checksum` | [Multihash](https://multiformats.io/multihash/) |
 | **W3C PROV** | Standard model for exchanging provenance and lineage information | [W3C PROV Overview](https://www.w3.org/TR/prov-overview/) |
+| **Dublin Core (DCMI Metadata Terms)** | `creator` term used for `provenance.creator` | [DCMI Metadata Terms](https://www.dublincore.org/specifications/dublin-core/dcmi-terms/) |
 | **CloudEvents** | Optional standard event metadata for messages sent over NATS, Kafka, MQTT, or other transports | [CloudEvents Specification](https://github.com/cloudevents/spec) |
 | **Government of Canada Policy on Government Security** | Canadian security and classification policy referenced by the `CAN` security policy | [Policy on Government Security](https://www.tbs-sct.canada.ca/pol/doc-eng.aspx?id=16578) |
 | **STANAG 4774** | NATO confidentiality metadata labelling | [NATO Standardization Agreements](https://nso.nato.int/nso/nsdd/main/standards/stanag-details/8612/EN) |
 | **STANAG 4778** | Binding security labels to the data they protect | [NATO Standardization Agreements](https://nso.nato.int/nso/nsdd/main/standards/stanag-details/8613/EN) |
 
+### 12.2 Standards used by the example kinds
+
+| Standard / specification | Used for | Example kinds | Reference |
+|---|---|---|---|
+| **EUROCONTROL ASTERIX** | Binary surveillance data format; CAT021 carries ADS-B reports | `track.raw`, `sensor.detection` | [EUROCONTROL ASTERIX](https://www.eurocontrol.int/asterix) |
+| **RTCA DO-260B** | ADS-B message definitions, including the emitter category | `sensor.detection`, `track.fused` | [RTCA](https://www.rtca.org/) |
+| **ASTM F3411** | Drone Remote ID broadcast and network messages | `sensor.detection` | [ASTM F3411](https://www.astm.org/f3411-22a.html) |
+| **ASTM F3548** | UTM operational intents, 4D volumes and intent states | `utm.volume`, `utm.intent_state`, `alert.nonconformance` | [ASTM F3548](https://www.astm.org/f3548-21.html) |
+| **AIXM 5.1 (Digital NOTAM)** | Structured NOTAM data, alongside the ICAO-format NOTAM text | `aim.notam` | [AIXM](https://aixm.aero/) |
+| **STANAG 4609 / MISB ST 0601** | Full-motion video with embedded KLV metadata (sensor and platform position, footprint) | `video.segment` | [MISB standards](https://nsgreg.nga.mil/misb.jsp) |
+| **RFC 8216 – HTTP Live Streaming (HLS)** | Browser playback rendition of video segments | `video.segment` | [RFC 8216 – HLS](https://www.rfc-editor.org/info/rfc8216/) |
+| **OGC Cloud Optimized GeoTIFF** | Imagery file format that clients can read in parts | `imagery.ortho` | [OGC COG Standard](https://docs.ogc.org/is/21-026/21-026.html) |
+| **STAC eo, proj and view extensions** | Field names for imagery bands, projection and viewing geometry | `imagery.ortho` | [STAC Extensions](https://stac-extensions.github.io/) |
+| **ISO 2533 – Standard Atmosphere** | Converting flight levels and pressure altitudes to heights (see 11) | `aim.notam`, `utm.volume`, `zone.geofence` | [ISO 2533](https://www.iso.org/standard/7472.html) |
