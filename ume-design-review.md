@@ -922,11 +922,6 @@ The platform should define and publish the actual namespaces. Each identifier ty
 - **Uniqueness scope:** what it must be unique within. Include enough in the ID to make it globally unique. For example, a NOTAM number is only unique per issuing office, so the ID should include the location indicator.
 - **Who assigns it:** the source, an adapter, or the platform.
 
-Two points to settle before v1:
-
-- **Namespace ownership.** Names such as `urn:track:` are not registered URN namespaces. That is fine internally, but they could clash if records are shared with partners. Placing all types under one controlled namespace, such as `urn:<org-ns>:track:...`, avoids this.
-- **Schema enforcement.** Each identifier type should have a matching pattern in the schemas. Today only `uuid`, `org`, `user` and `source` are checked strictly.
-
 ---
 
 ## 10. Schema catalogue
@@ -1051,22 +1046,22 @@ These are only example `kind` values, created to show how UME could work with di
 
 | Kind | What it represents | Time | Location / shape | Height | Linked entity | Files |
 |---|---|---|---|---|---|---|
-| `track.raw` | One raw message from a sensor | Single point in time | Sensor coverage area (Polygon) | — | — | Binary recording of the raw sensor data (for example ASTERIX), required, usually one file per time period. The record points to where its message sits in the file, using a byte offset and length. |
-| `sensor.detection` | One detection from a sensor before tracks are combined | Single point in time | Estimated position (Point) | Optional | Optional | — |
-| `track.fused` | The latest state of a fused track | Single point in time | Track position (Point) | Optional | Track | — |
-| `track.command` | An operator action applied to a track | Single point in time | Optional (Point) | — | Target track, if needed | — |
-| `alert.zone_breach` | An alert when a track enters, leaves, or stays too long in a zone | Single point in time | Where the breach happened (Point) | Optional | Alert | — |
-| `alert.nonconformance` | An alert when a track leaves its planned UTM volume | Single point in time | Track position (Point) | Optional | Alert | — |
-| `alert.state_change` | A change to an alert, such as acknowledged, escalated, resolved, or dismissed | Single point in time | None | — | Alert | — |
-| `video.segment` | A section of full-motion video | Time period | Area shown by the video (Polygon) | Optional | — | The original video segment with its embedded KLV metadata (MPEG-TS, STANAG 4609), required. Optionally an HLS rendition for playback in a browser, a thumbnail image, and the KLV metadata decoded to JSON. |
-| `imagery.ortho` | An orthorectified image | Time period | Image footprint (Polygon) | Optional | — | The orthorectified image as a Cloud Optimized GeoTIFF (COG), required, so clients can read just the area and resolution they need. Optionally a thumbnail image for previews. |
-| `utm.volume` | One 4D airspace volume for an operational intent | Time period | 2D footprint (Polygon / MultiPolygon) | Lower and upper limits | Operational intent | — |
-| `utm.intent_state` | A change in the state of an operational intent | Single point in time | Optional | — | Operational intent | — |
-| `aim.notam` | A NOTAM that applies to an area | Time period | Restricted area (Polygon / MultiPolygon) | Lower and upper limits | NOTAM | The original NOTAM as AIXM 5.1 Digital NOTAM XML, required. Optionally the original ICAO-format text, as pilots and operators read it. |
-| `zone.geofence` | A protected, restricted, or monitored area | Time period, optionally no end time | Zone area (Polygon / MultiPolygon) | Lower and upper limits | Zone | — |
-| `sensor.status` | Sensor health, status, and coverage | Single point in time | Sensor coverage area (Polygon) | Optional | Sensor | — |
-| `analysis.measurement` | A distance or path measured with a map measurement tool | Single point in time | Measured line (LineString) | Optional | Measurement | — |
-| `analysis.range_ring` | Concentric range rings drawn with a map analysis tool | Single point in time | Ring centre (Point) | — | Range rings | — |
+| `track.raw` | One raw message from a sensor, such as an ASTERIX CAT021 ADS-B report. The record describes the message (format, category, size); the bytes stay in the recording | Single point in time | Sensor coverage area (Polygon) | — | — | Binary recording of the raw sensor data (for example ASTERIX), required, usually one file per time period. The record points to where its message sits in the file, using a byte offset and length. |
+| `sensor.detection` | One detection from a single sensor (for example radar, RF, Remote ID, ADS-B or a camera) before tracks are combined, with sensor-specific details such as range, signal strength or classification | Single point in time | Estimated position (Point) | Optional | Optional | — |
+| `track.fused` | The latest state of a fused track built from one or more sensors, such as identity, callsign, speed, course and altitude | Single point in time | Track position (Point) | Optional | Track | — |
+| `track.command` | An operator action applied to one or more tracks, such as merging, splitting, reclassifying, identifying, tagging or dropping them, with the reason | Single point in time | Optional (Point) | — | Target track, if needed | — |
+| `alert.zone_breach` | An alert when a track enters, leaves, or stays too long in a zone, with the zone and how long the track stayed | Single point in time | Where the breach happened (Point) | Optional | Alert | — |
+| `alert.nonconformance` | An alert when a drone track leaves the planned volume of its UTM operational intent, with how far it deviated | Single point in time | Track position (Point) | Optional | Alert | — |
+| `alert.state_change` | A change to an alert, such as acknowledged, escalated, resolved, or dismissed, with an optional note. The original alert record is never edited | Single point in time | None | — | Alert | — |
+| `video.segment` | A section of full-motion video from an airborne or ground sensor, with codec, resolution, frame rate and platform details | Time period | Area shown by the video (Polygon) | Optional | — | The original video segment with its embedded KLV metadata (MPEG-TS, STANAG 4609), required. Optionally an HLS rendition for playback in a browser, a thumbnail image, and the KLV metadata decoded to JSON. |
+| `imagery.ortho` | An orthorectified image or mosaic, corrected so it lines up with the map, with resolution, bands and cloud cover described using STAC fields | Time period | Image footprint (Polygon) | Optional | — | The orthorectified image as a Cloud Optimized GeoTIFF (COG), required, so clients can read just the area and resolution they need. Optionally a thumbnail image for previews. |
+| `utm.volume` | One 4D airspace volume (area, height limits and time window) that a drone operation has reserved as part of its UTM operational intent | Time period | 2D footprint (Polygon / MultiPolygon) | Lower and upper limits | Operational intent | — |
+| `utm.intent_state` | A change in the state of a drone operation's UTM operational intent, such as accepted, activated, non-conforming or ended | Single point in time | Optional | — | Operational intent | — |
+| `aim.notam` | A NOTAM (notice to airmen) that restricts or warns about an area of airspace for a period, such as a temporary flight restriction | Time period | Restricted area (Polygon / MultiPolygon) | Lower and upper limits | NOTAM | The original NOTAM as AIXM 5.1 Digital NOTAM XML, required. Optionally the original ICAO-format text, as pilots and operators read it. |
+| `zone.geofence` | A protected, restricted, or monitored area, such as a substation or airport, with who defined it and how serious a breach is | Time period, optionally no end time | Zone area (Polygon / MultiPolygon) | Lower and upper limits | Zone | — |
+| `sensor.status` | The health and status of a sensor (for example operational, degraded or offline), its position, and the area it can currently cover | Single point in time | Sensor coverage area (Polygon) | Optional | Sensor | — |
+| `analysis.measurement` | A distance or path measured by an operator with a map measurement tool, with total and segment lengths and the starting bearing | Single point in time | Measured line (LineString) | Optional | Measurement | — |
+| `analysis.range_ring` | Concentric range rings drawn by an operator with a map analysis tool, stored as a centre point, number of rings and spacing | Single point in time | Ring centre (Point) | — | Range rings | — |
 
 ---
 
