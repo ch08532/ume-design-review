@@ -42,8 +42,7 @@
       "revision_of": null,
       "produced_by": "omnitrack-engine",
       "producer_version": "3.4.1",
-      "producer_org": "urn:org:dnd",
-      "config_hash": "12209c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c"
+      "producer_org": "urn:org:dnd"
     },
     "security": {
       "policy": "CAN",

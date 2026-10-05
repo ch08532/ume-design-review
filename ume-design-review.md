@@ -326,7 +326,7 @@ The main recommendation is to separate **information about the UME record** from
 | **A3** | `lifecycle` mixes different ideas. `RAW` describes what the data is, while `PROCESSING` and `AVAILABLE` describe its current state. | Use `kind` or the payload to describe the type of data. Keep temporary processing state separate from the historical UME record. |
 | **A4** | `lifecycle` and `storage_tier` can change after the UME is written. | Keep changing state outside the UME record, for example in a separate `ume_state` table or storage-management service. |
 | **A5** | `source_id` is an integer, but the design does not define whether it is unique across all sites and nodes. | Use a stable identifier per device or producing service, such as `urn:source:pingstation3-0037`, and record the ingesting node separately in `source.node`. Keeping the site out of the source ID means a sensor that moves between sites keeps the same identity. |
-| **A6** | `sha256` is included, but it is not clear exactly what data is being hashed. | Define the checksum as the hash of the exact asset bytes so every service calculates it the same way. Store it as a SHA-256 multihash (`1220` followed by 64 hex characters), the format the STAC File extension uses for `file:checksum`. `config_hash` uses the same format. |
+| **A6** | `sha256` is included, but it is not clear exactly what data is being hashed. | Define the checksum as the hash of the exact asset bytes so every service calculates it the same way. Store it as a SHA-256 multihash (`1220` followed by 64 hex characters), the format the STAC File extension uses for `file:checksum`. |
 | **A7** | Some checksum values in the examples appear to be placeholders. | Use real or clearly marked example checksum values and validate them as part of the test examples. |
 | **A8** | The relationship between the UME ID and asset UUID is not clearly defined. | Only give an asset its own ID when it needs a separate identity, such as when several UME records reference the same file. |
 | **A9** | There is no way to recognise the same source event arriving twice, for example when two adapters receive the same sensor message or a node replays data after reconnecting. The record ID cannot do this, because each producer generates its own. | Add `source.event_id`, derived from source-native data (a message ID or a natural key) so every adapter computes the same value. The deduplication key is `(source.id, kind, source.event_id)`. `kind` is included because one source event can produce several records, such as a `track.raw` and a `sensor.detection` from the same ASTERIX report. |
@@ -339,7 +339,7 @@ The main improvement is to capture more information about **how a record was cre
 
 | ID | Finding | Suggested change |
 |---|---|---|
-| **V1** | The record does not identify the software version or configuration that produced it. | Add fields such as `producer_version` and `config_hash` so the exact producer setup can be traced later. |
+| **V1** | The record does not identify the software version that produced it. | Add `producer_version` alongside `produced_by` so the exact software that produced a record can be traced later. |
 | **V2** | `derivedfrom` shows where a record came from, but there is no clear way to say that one record replaces or corrects another. | Add `revision_of` for corrections or replacements of an earlier record. Normal track updates should remain separate observations, not revisions. |
 | **V3** | The lineage structure is specific to UME. | Keep the UME structure simple, but consider mapping it to W3C PROV when data needs to be exchanged with systems that use a standard provenance model. |
 | **V4** | The design does not define a way to prove that provenance information has not been changed. | Where chain-of-custody or stronger integrity is required, consider signing records or batches at the producer. |
@@ -357,8 +357,7 @@ A simple provenance structure could look like:
   "produced_by": "omnitrack-engine",
   "producer_version": "3.4.1",
   "producer_org": "urn:org:dnd",
-  "creator": null,
-  "config_hash": "12209c9c...9c"
+  "creator": null
 }
 ```
 
@@ -369,7 +368,6 @@ A simple provenance structure could look like:
 | `revision_of` | No | The earlier record that this one corrects or replaces. |
 | `produced_by` | Yes | The software or service that created the record. |
 | `producer_version` | No | The version of that software. |
-| `config_hash` | No | A fingerprint (SHA-256 multihash, A6) of the settings the producer used, such as tracker limits or alert thresholds. Settings can change without a new software version, so this shows exactly which setup produced a result. It must match a configuration that is stored and can be looked up. |
 | `producer_org` | Yes | The organization that produced the record. This may differ from the security `originator` (7.3). |
 | `creator` | No | The person who caused the record, when a person did, for example `urn:user:northgrid:op-117` for an operator command. It is null here because a tracker produced the record. It is treated as personal information. |
 
@@ -758,8 +756,7 @@ This example shows how a fused track from a sensor, such as ADS-B, could be repr
       "produced_by": "omnitrack-engine",
       "producer_version": "3.4.1",
       "producer_org": "urn:org:dnd",
-      "creator": null,
-      "config_hash": "12209c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c"
+      "creator": null
     },
     "security": {
       "policy": "CAN",
@@ -883,7 +880,6 @@ The **See** column points to the section that explains why the field is designed
 | `producer_version` | String or `null` | No | The version of that software. | ✖ UME | [6.5](#65-provenance-and-versioning) (V1) |
 | `producer_org` | URN (`urn:org:...`) | Yes | The organization that produced the record. May differ from `security.originator`. | ◐ URN format, UME namespace | [6.5](#65-provenance-and-versioning) |
 | `creator` | URN (`urn:user:...`) or `null` | No | The person who caused the record, such as the operator who issued a command. `null` for records generated by sensors and services. Treated as personal information. | ◐ Dublin Core `creator` / W3C PROV attribution; UME namespace | [6.5](#65-provenance-and-versioning) (V5) |
-| `config_hash` | SHA-256 multihash or `null` | No | Fingerprint of the producer settings used, such as tracker limits or alert thresholds. | ✅ SHA-256, multihash format | [6.5](#65-provenance-and-versioning) (V1) |
 
 #### `properties.security`
 
@@ -1446,7 +1442,7 @@ The following standards and specifications are referenced in this review. These 
 | **IANA Media Types** | Standard media types used by links and assets, such as `image/jpeg` and `video/mp2t` | [IANA Media Types Registry](https://www.iana.org/assignments/media-types) |
 | **STAC** | Asset, link, imagery, and spatiotemporal metadata patterns | [STAC Specification](https://github.com/radiantearth/stac-spec) |
 | **STAC File Info Extension** | Fields such as `file:size` and `file:checksum` | [STAC File Info Extension](https://github.com/stac-extensions/file) |
-| **FIPS 180-4 – Secure Hash Standard** | SHA-256 checksums used for file and configuration integrity | [NIST FIPS 180-4](https://csrc.nist.gov/pubs/fips/180-4/upd1/final) |
+| **FIPS 180-4 – Secure Hash Standard** | SHA-256 checksums used for file integrity | [NIST FIPS 180-4](https://csrc.nist.gov/pubs/fips/180-4/upd1/final) |
 | **W3C PROV** | Standard model for exchanging provenance and lineage information | [W3C PROV Overview](https://www.w3.org/TR/prov-overview/) |
 | **CloudEvents** | Optional standard event metadata for messages sent over NATS, Kafka, MQTT, or other transports | [CloudEvents Specification](https://github.com/cloudevents/spec) |
 | **Government of Canada Policy on Government Security** | Canadian security and classification policy referenced by the `CAN` security policy | [Policy on Government Security](https://www.tbs-sct.canada.ca/pol/doc-eng.aspx?id=16578) |

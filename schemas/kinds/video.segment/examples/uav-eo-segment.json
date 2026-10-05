@@ -62,8 +62,7 @@
       "revision_of": null,
       "produced_by": "mediamtx-segmenter",
       "producer_version": "1.9.0",
-      "producer_org": "urn:org:dnd",
-      "config_hash": "12203f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f"
+      "producer_org": "urn:org:dnd"
     },
     "security": {
       "policy": "CAN",

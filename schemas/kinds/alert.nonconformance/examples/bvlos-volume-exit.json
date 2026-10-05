@@ -42,8 +42,7 @@
       "revision_of": null,
       "produced_by": "conformance-monitor",
       "producer_version": "0.3.0",
-      "producer_org": "urn:org:northgrid-utility",
-      "config_hash": "1220d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2d2"
+      "producer_org": "urn:org:northgrid-utility"
     },
     "security": {
       "policy": "CORP",

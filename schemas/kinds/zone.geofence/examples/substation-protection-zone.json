@@ -61,8 +61,7 @@
       "revision_of": null,
       "produced_by": "zone-admin",
       "producer_version": "1.0.0",
-      "producer_org": "urn:org:northgrid-utility",
-      "config_hash": null
+      "producer_org": "urn:org:northgrid-utility"
     },
     "security": {
       "policy": "CORP",

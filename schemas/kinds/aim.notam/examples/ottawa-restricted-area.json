@@ -141,8 +141,7 @@
       "revision_of": null,
       "produced_by": "notam-adapter",
       "producer_version": "0.2.1",
-      "producer_org": "urn:org:northgrid-utility",
-      "config_hash": null
+      "producer_org": "urn:org:northgrid-utility"
     },
     "security": {
       "policy": "CORP",

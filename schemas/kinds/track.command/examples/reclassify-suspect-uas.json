@@ -41,8 +41,7 @@
       "produced_by": "operator-console",
       "producer_version": "2.3.1",
       "producer_org": "urn:org:northgrid-utility",
-      "creator": "urn:user:northgrid:op-117",
-      "config_hash": null
+      "creator": "urn:user:northgrid:op-117"
     },
     "security": {
       "policy": "CORP",

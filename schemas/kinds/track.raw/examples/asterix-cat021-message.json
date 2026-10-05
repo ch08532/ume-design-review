@@ -137,8 +137,7 @@
       "revision_of": null,
       "produced_by": "pingstation-adapter",
       "producer_version": "1.2.0",
-      "producer_org": "urn:org:dnd",
-      "config_hash": null
+      "producer_org": "urn:org:dnd"
     },
     "security": {
       "policy": "CAN",

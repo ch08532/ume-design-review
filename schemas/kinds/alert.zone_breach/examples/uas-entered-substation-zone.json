@@ -42,8 +42,7 @@
       "revision_of": null,
       "produced_by": "alert-engine",
       "producer_version": "1.4.0",
-      "producer_org": "urn:org:northgrid-utility",
-      "config_hash": "1220b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8"
+      "producer_org": "urn:org:northgrid-utility"
     },
     "security": {
       "policy": "CORP",
